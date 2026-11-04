@@ -224,3 +224,9 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Why (Niel): reviewing from scratch (A) causes duplicate comments and bloated context long term; deleting and reposting (C) might work but loses discussion and history.
 - Open: who has the final word on "fixed" (D-25b).
 - Exam link: TS 3.6 (prior findings in context to avoid duplicate comments)
+
+## D-25b Who decides "fixed": C (code closes what it can prove, a person closes the rest) — 2026-11-05
+- Why (Niel): the bot alone (A) is too risky and might only be a temporary fix; a person for everything (B) creates too much review work for small fixes that don't need a human.
+- Code-provable example: criterion 3 (rule code changed without a test) -> closed automatically when the PR also changes the matching .test.ts. Criteria 1, 2, 4 -> the bot may say "looks fixed"; a person closes the thread.
+- Meeting line: "The bot can suggest a fix is done, but only code or a person can close a finding, because a wrongly closed problem is never looked at again."
+- Exam link: TS 3.6, 5.5 (model judgment is a suggestion, not proof)
