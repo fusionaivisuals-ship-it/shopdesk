@@ -230,3 +230,9 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Code-provable example: criterion 3 (rule code changed without a test) -> closed automatically when the PR also changes the matching .test.ts. Criteria 1, 2, 4 -> the bot may say "looks fixed"; a person closes the thread.
 - Meeting line: "The bot can suggest a fix is done, but only code or a person can close a finding, because a wrongly closed problem is never looked at again."
 - Exam link: TS 3.6, 5.5 (model judgment is a suggestion, not proof)
+
+## D-26 Review output schema: findings[] + required review_status complete|incomplete (B) — 2026-11-05
+- Choice: Niel (no reason stated). Suggested meeting line (Niel to confirm): "A clean review always means checked and clean; if the bot couldn't finish, the check fails and says why."
+- Rejected: empty findings on failure (A: "couldn't review" = "found nothing", same trap as D-11); warning only (C: warnings get ignored).
+- Schema: {review_status, incomplete_reason?, findings: [{file, line, criterion 1-4, explanation, suggested_fix, status new|still_open|looks_fixed}]}
+- Exam link: TS 3.6 (--output-format json + --json-schema), 5.3 (failure must stay visible)
