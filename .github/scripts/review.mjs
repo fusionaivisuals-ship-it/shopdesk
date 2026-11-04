@@ -5,7 +5,8 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 
-const { GITHUB_TOKEN, GITHUB_REPOSITORY, PR_NUMBER, BASE_SHA, HEAD_SHA } = process.env;
+const { GITHUB_TOKEN, GITHUB_REPOSITORY, PR_NUMBER, BASE_SHA, HEAD_SHA, EVENT_ACTION } = process.env;
+const OVERRIDE_LABEL = "review-override"; // D-28
 const MARKER = "<!-- shopdesk-review -->";
 const MAX_DIFF_CHARS = 100_000;
 const api = (path, opts = {}) =>
@@ -24,7 +25,10 @@ const mine = comments.find((c) => c.body.includes(MARKER));
 const prev = mine ? JSON.parse(mine.body.match(/<!-- data:(.*?) -->/s)?.[1] ?? "[]") : [];
 
 let review;
-if (diff.length > MAX_DIFF_CHARS) {
+if ((EVENT_ACTION === "labeled" || EVENT_ACTION === "unlabeled") && mine) {
+  // Only a label changed, not the code: reuse the previous findings, no new Claude call ($0).
+  review = { review_status: "complete", findings: prev };
+} else if (diff.length > MAX_DIFF_CHARS) {
   // Decided by code, not the model: too big to review reliably (D-26).
   review = { review_status: "incomplete", incomplete_reason: `diff is ${diff.length} characters (limit ${MAX_DIFF_CHARS})`, findings: [] };
 } else {
@@ -78,7 +82,7 @@ const closed = review.findings.filter((f) => f.status === "closed_by_code");
 const body = `${MARKER}
 ## ShopDesk review: ${review.review_status === "incomplete" ? "⚠️ INCOMPLETE" : open.length ? `${open.length} open finding(s)` : "✅ checked, no findings"}
 ${review.review_status === "incomplete" ? `\nReview incomplete: ${review.incomplete_reason}\n` : ""}${section("Open", open)}${section("Looks fixed: a person must confirm (D-25b)", looksFixed)}${section("Closed by code (matching test changed)", closed)}
-<sub>Commit ${HEAD_SHA.slice(0, 7)} · criteria from CLAUDE.md · model: haiku (D-27)</sub>
+<sub>Open findings block merging unless a person adds the `review-override` label (D-28) · Commit ${HEAD_SHA.slice(0, 7)} · criteria from CLAUDE.md · model: haiku (D-27)</sub>
 <!-- data:${JSON.stringify(review.findings.filter((f) => f.status !== "closed_by_code"))} -->`;
 
 if (mine) await api(`/issues/comments/${mine.id}`, { method: "PATCH", body: JSON.stringify({ body }) });
@@ -86,3 +90,12 @@ else await api(`/issues/${PR_NUMBER}/comments`, { method: "POST", body: JSON.str
 
 console.log(body);
 if (review.review_status === "incomplete") { console.error("Review incomplete"); process.exit(1); }
+
+// D-28: open findings block merging unless a person adds the override label (visible, recorded).
+const pr = await api(`/pulls/${PR_NUMBER}`);
+const overridden = pr.labels.some((l) => l.name === OVERRIDE_LABEL);
+if (open.length && !overridden) {
+  console.error(`${open.length} open finding(s). Fix them, or a person adds the "${OVERRIDE_LABEL}" label after checking.`);
+  process.exit(1);
+}
+if (open.length && overridden) console.log(`Open findings overridden by the "${OVERRIDE_LABEL}" label.`);
