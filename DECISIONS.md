@@ -236,3 +236,10 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Rejected: empty findings on failure (A: "couldn't review" = "found nothing", same trap as D-11); warning only (C: warnings get ignored).
 - Schema: {review_status, incomplete_reason?, findings: [{file, line, criterion 1-4, explanation, suggested_fix, status new|still_open|looks_fixed}]}
 - Exam link: TS 3.6 (--output-format json + --json-schema), 5.3 (failure must stay visible)
+
+## D-27 CI review model: Haiku (for now) — 2026-11-05
+- Why (Niel): this is a test product. For a real product I'd choose Sonnet, which I think is best for review, especially code.
+- Guard: hard monthly limit on the CI API key in the Anthropic console (e.g. $5/month = $60/year, ~NT$160/month, NT$1,920/year). Prices not verified.
+- Upgrade trigger: if the review misses a finding we later catch by hand, rerun that PR on Sonnet and compare (same approach as D-12).
+- Meeting line: "We review with the cheap model while the stakes are a demo; for a real client, code review is where the larger model earns its cost, because reviews are rare and misses are expensive."
+- Exam link: TS 3.6, cost vs reliability trade-off
