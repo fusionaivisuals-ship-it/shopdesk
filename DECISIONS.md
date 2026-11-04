@@ -219,3 +219,8 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Why (Niel): I don't want problems only caught afterwards in review; with the criteria in CLAUDE.md, Claude Code avoids the mistakes while building, and CI reads the same file. A separate file (C) or the CI prompt (B) leaves a building gap.
 - Meeting line: "The same four rules guide the AI while it writes code and when it reviews it, from one file, so the rules can't drift apart."
 - Exam link: TS 3.6 (CLAUDE.md gives CI its project context), 3.1
+
+## D-25 Review re-runs: B (pass previous findings; report only new or still-unfixed) — 2026-11-05
+- Why (Niel): reviewing from scratch (A) causes duplicate comments and bloated context long term; deleting and reposting (C) might work but loses discussion and history.
+- Open: who has the final word on "fixed" (D-25b).
+- Exam link: TS 3.6 (prior findings in context to avoid duplicate comments)
