@@ -214,3 +214,8 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Review criteria: (1) business rule in a prompt instead of lib/rules (D-02b, D-07); (2) tool returns fields outside D-06 or verification detail beyond the generic result (D-04); (3) rule code changed without a matching test change (D-16); (4) a secret in a committed file. Style and naming are explicitly ignored.
 - Meeting line: "Tests catch what we wrote tests for; the AI review checks only our four design rules, so every comment it posts is one we decided matters."
 - Exam link: TS 3.6, 4.1 (explicit criteria reduce false positives)
+
+## D-24 Review criteria live in the project CLAUDE.md (A) — 2026-11-05
+- Why (Niel): I don't want problems only caught afterwards in review; with the criteria in CLAUDE.md, Claude Code avoids the mistakes while building, and CI reads the same file. A separate file (C) or the CI prompt (B) leaves a building gap.
+- Meeting line: "The same four rules guide the AI while it writes code and when it reviews it, from one file, so the rules can't drift apart."
+- Exam link: TS 3.6 (CLAUDE.md gives CI its project context), 3.1
