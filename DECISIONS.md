@@ -249,3 +249,10 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - tests: success (run 41881600262, 01:54:38 Taipei) -> tests can't see this mistake.
 - claude-review: success (run 41881600285, 01:54:55 Taipei), posted 1 open finding: criterion 1 at lib/agent/system-prompt.ts:4, correct reason and fix. No false positives.
 - Observation: the check is green even with an open finding, because only "incomplete" fails it (D-26). Whether open findings should block merging is undecided (D-28).
+
+## D-28 Open findings block merging, a person can override with the "review-override" label (C) — 2026-11-05
+- Why (Niel): comment-only (A) means someone has to go and read the comments, which slows things down and gets missed; blocking with no way out (B) lets each small problem hold up the whole process.
+- How: the claude-review check fails while there are open findings, unless the PR has the review-override label. Adding/removing the label re-runs the check WITHOUT a new Claude call (reuses the findings, $0).
+- Meeting line: "Findings block by default; a person can overrule the bot, but only visibly, with a label on the record."
+- Exam link: TS 3.6, 5.5 (human review where the model may be wrong)
+- Incident: commit eca0287 pushed a review.mjs with a syntax error (Claude's command committed even though the syntax check failed). Fixed in the next commit; commit steps now only run after the check passes.

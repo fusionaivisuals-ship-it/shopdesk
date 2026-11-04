@@ -82,7 +82,7 @@ const closed = review.findings.filter((f) => f.status === "closed_by_code");
 const body = `${MARKER}
 ## ShopDesk review: ${review.review_status === "incomplete" ? "⚠️ INCOMPLETE" : open.length ? `${open.length} open finding(s)` : "✅ checked, no findings"}
 ${review.review_status === "incomplete" ? `\nReview incomplete: ${review.incomplete_reason}\n` : ""}${section("Open", open)}${section("Looks fixed: a person must confirm (D-25b)", looksFixed)}${section("Closed by code (matching test changed)", closed)}
-<sub>Open findings block merging unless a person adds the `review-override` label (D-28) · Commit ${HEAD_SHA.slice(0, 7)} · criteria from CLAUDE.md · model: haiku (D-27)</sub>
+<sub>Open findings block merging unless a person adds the "review-override" label (D-28) · Commit ${HEAD_SHA.slice(0, 7)} · criteria from CLAUDE.md · model: haiku (D-27)</sub>
 <!-- data:${JSON.stringify(review.findings.filter((f) => f.status !== "closed_by_code"))} -->`;
 
 if (mine) await api(`/issues/comments/${mine.id}`, { method: "PATCH", body: JSON.stringify({ body }) });
