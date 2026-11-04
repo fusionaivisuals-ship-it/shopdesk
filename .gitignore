@@ -1,0 +1,7 @@
+# Secrets (API key, database password) - never committed
+.env
+.env.*
+!.env.example
+
+node_modules/
+.next/
