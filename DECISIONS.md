@@ -256,3 +256,5 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Meeting line: "Findings block by default; a person can overrule the bot, but only visibly, with a label on the record."
 - Exam link: TS 3.6, 5.5 (human review where the model may be wrong)
 - Incident: commit eca0287 pushed a review.mjs with a syntax error (Claude's command committed even though the syntax check failed). Fixed in the next commit; commit steps now only run after the check passes.
+- D-28 / D-25 verified on PR #1 re-run (commit d39e1f5): tests success (run 41882929845); claude-review FAILURE (run 41882929851, 02:02:17 Taipei) = blocked by 1 open finding, no override label. Still exactly 1 bot comment (updated, not duplicated); finding status "still_open".
+- Domain 3 build complete (TS 3.1-3.6).
