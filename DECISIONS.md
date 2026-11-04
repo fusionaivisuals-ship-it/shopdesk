@@ -243,3 +243,9 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Upgrade trigger: if the review misses a finding we later catch by hand, rerun that PR on Sonnet and compare (same approach as D-12).
 - Meeting line: "We review with the cheap model while the stakes are a demo; for a real client, code review is where the larger model earns its cost, because reviews are rare and misses are expensive."
 - Exam link: TS 3.6, cost vs reliability trade-off
+
+## D3 S6 test run — 2026-11-05
+- PR #1 deliberately put return eligibility in the agent prompt (criterion 1).
+- tests: success (run 41881600262, 01:54:38 Taipei) -> tests can't see this mistake.
+- claude-review: success (run 41881600285, 01:54:55 Taipei), posted 1 open finding: criterion 1 at lib/agent/system-prompt.ts:4, correct reason and fix. No false positives.
+- Observation: the check is green even with an open finding, because only "incomplete" fails it (D-26). Whether open findings should block merging is undecided (D-28).
