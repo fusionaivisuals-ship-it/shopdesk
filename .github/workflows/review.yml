@@ -2,6 +2,7 @@
 name: claude-review
 on:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
 permissions:
   contents: read
   pull-requests: write
@@ -24,3 +25,4 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          EVENT_ACTION: ${{ github.event.action }}
