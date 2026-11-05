@@ -276,3 +276,4 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Meeting line: "Every tool failure says what kind it is and what to do next; an outage can never be mistaken for an empty result."
 - Exam link: TS 2.2, 5.3
 - Built 2026-11-06 with /new-tool: list_orders + test (verified customer only, summary fields, permission + transient errors; outage never returns an empty list). Suite 26/26 pass (local).
+- D2 S2 exam Q (get_order timeout returned null): answered C correctly. Note: B (hook rewriting null) can't tell a real 'not found' from a timeout, so it would make every genuine not-found look like an outage; fix at the source.
