@@ -6,6 +6,7 @@ import { emptyCounter, type Counter } from "../rules/lock";
 export type Store = {
   findOrder(number: string): Order | null;
   findCustomer(id: string): Customer | null;
+  listOrdersFor(customerId: string): Order[]; // may throw when the database is unavailable
   getCounter(key: string): Counter;
   setCounter(key: string, c: Counter): void;
   getVerifiedCustomer(conversationId: string): string | null;
@@ -14,7 +15,7 @@ export type Store = {
   log(entry: Record<string, unknown>): void; // server log: staff only, never shown to Claude (D-04)
 };
 
-export function memoryStore(): Store & { tickets: unknown[]; logs: unknown[] } {
+export function memoryStore(opts: { down?: boolean } = {}): Store & { tickets: unknown[]; logs: unknown[] } {
   const counters = new Map<string, Counter>();
   const verified = new Map<string, string>();
   const tickets: unknown[] = [];
@@ -24,6 +25,10 @@ export function memoryStore(): Store & { tickets: unknown[]; logs: unknown[] } {
     logs,
     findOrder: (n) => orders.find((o) => o.number === n) ?? null,
     findCustomer: (id) => customers.find((c) => c.id === id) ?? null,
+    listOrdersFor: (id) => {
+      if (opts.down) throw new Error("connection timeout"); // simulated outage for tests (D-30)
+      return orders.filter((o) => o.customerId === id);
+    },
     getCounter: (k) => counters.get(k) ?? emptyCounter(),
     setCounter: (k, c) => void counters.set(k, c),
     getVerifiedCustomer: (id) => verified.get(id) ?? null,

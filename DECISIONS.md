@@ -267,3 +267,12 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Exam link: TS 2.1
 - Built 2026-11-05 with /new-tool: data/shop.ts (fictional), lib/tools/store.ts (in-memory, Neon later), verify_customer.ts + test (8 tests). Full suite 23/23 pass (local run).
 - 2026-11-06: added mixed-message example to verify_customer description after the 2.1 exam question (policy question that mentions an order -> search_policy, no verification).
+
+## D-30 Tool errors: C (structured: isError, category, retryable, next_step); "no orders" stays a normal success — 2026-11-06
+- Why (Niel): A is a mistake: with no record of what went wrong I can never fix things, and this LLM should help me, not hinder me. B is too little information to act on. C is best for long-term gain.
+- Also (Claude): A's worst effect is on the customer: an outage looks like "you have no orders", so the agent states something false (TrailShop: 6/6 fooled; with a contract 0/15).
+- Categories: transient (retry once), validation (ask the customer to correct), business (don't retry, explain), permission (do the prerequisite, e.g. verify_customer). Detail still goes to the staff log.
+- Revisits D-11's caveat for policy search later (same contract).
+- Meeting line: "Every tool failure says what kind it is and what to do next; an outage can never be mistaken for an empty result."
+- Exam link: TS 2.2, 5.3
+- Built 2026-11-06 with /new-tool: list_orders + test (verified customer only, summary fields, permission + transient errors; outage never returns an empty list). Suite 26/26 pass (local).
