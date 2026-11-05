@@ -277,3 +277,10 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Exam link: TS 2.2, 5.3
 - Built 2026-11-06 with /new-tool: list_orders + test (verified customer only, summary fields, permission + transient errors; outage never returns an empty list). Suite 26/26 pass (local).
 - D2 S2 exam Q (get_order timeout returned null): answered C correctly. Note: B (hook rewriting null) can't tell a real 'not found' from a timeout, so it would make every genuine not-found look like an outage; fix at the source.
+
+## D-31 tool_choice for the live chat: B (auto everywhere) — 2026-11-06
+- Why (Niel): forcing verify_customer first (A) makes simple questions complicated when the customer just wants an answer; tools every turn (C) means constant pointless calls.
+- Niel's concern: auto gets riskier as the bot grows, because more choices mean more wrong guesses. Mitigations: keep the live agent's tool set small and clearly separated (owner tools like unlock_order never go to the live agent); every rule is enforced inside the tools, so a wrong guess hits a permission error, not a leak.
+- Forced tool_choice is reserved for steps that must produce structured output (e.g. the handoff ticket in Domain 4).
+- Meeting line: "The agent chooses its tools, but every tool checks the rules itself, so a wrong choice costs a retry, never a data leak."
+- Exam link: TS 2.3 (tool_choice auto/any/forced; scoped tool sets)
