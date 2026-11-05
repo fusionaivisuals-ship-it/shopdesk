@@ -284,3 +284,4 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Forced tool_choice is reserved for steps that must produce structured output (e.g. the handoff ticket in Domain 4).
 - Meeting line: "The agent chooses its tools, but every tool checks the rules itself, so a wrong choice costs a retry, never a data leak."
 - Exam link: TS 2.3 (tool_choice auto/any/forced; scoped tool sets)
+- D2 S3 exam Q (owner tools added to the live agent behind a prompt): answered B correctly. Niel: a prompt-only guard means someone can try to talk the bot into reaching personal information.
