@@ -266,3 +266,4 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Meeting line: "The tool's description is the agent's instruction manual; it says when to use the tool, when not to, and what to do with every result."
 - Exam link: TS 2.1
 - Built 2026-11-05 with /new-tool: data/shop.ts (fictional), lib/tools/store.ts (in-memory, Neon later), verify_customer.ts + test (8 tests). Full suite 23/23 pass (local run).
+- 2026-11-06: added mixed-message example to verify_customer description after the 2.1 exam question (policy question that mentions an order -> search_policy, no verification).

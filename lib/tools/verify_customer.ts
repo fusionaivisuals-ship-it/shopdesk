@@ -24,6 +24,7 @@ EXAMPLES:
 - "Where is my order?" -> ask for email + order number, then verify_customer.
 - "My order GC-1042 hasn't arrived, I'm mei.lin@example.com" -> verify_customer with both.
 - "Do you ship to Japan?" -> do NOT verify; use search_policy.
+- "I ordered the vitamin C serum last week, what's your return policy for opened items?" -> do NOT verify; this is a general policy question even though it mentions an order. Use search_policy. Verify only if they then ask about THEIR specific order.
 - "Is this email registered with you?" -> do NOT verify; say you can only help with orders after verification.`,
   input_schema: {
     type: "object",
