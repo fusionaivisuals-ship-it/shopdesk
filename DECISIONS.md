@@ -258,3 +258,11 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Incident: commit eca0287 pushed a review.mjs with a syntax error (Claude's command committed even though the syntax check failed). Fixed in the next commit; commit steps now only run after the check passes.
 - D-28 / D-25 verified on PR #1 re-run (commit d39e1f5): tests success (run 41882929845); claude-review FAILURE (run 41882929851, 02:02:17 Taipei) = blocked by 1 open finding, no override label. Still exactly 1 bot comment (updated, not duplicated); finding status "still_open".
 - Domain 3 build complete (TS 3.1-3.6).
+
+## D-29 verify_customer description: C (full description + sample customer messages) — 2026-11-05
+- Why (Niel): be prepared for the edge cases, which is exactly what could go wrong with B; A doesn't cover enough cases or give the LLM enough structure.
+- Contents: what it checks + input formats; when to use (before any order question, once per conversation); when NOT (already verified, "checking" an email, retrying after locked, policy-only questions); what each result means (follow next_step, never say which detail was wrong); sample messages.
+- Watch item (Domain 4): examples can make Claude over-match their exact wording; check this in the Haiku trial (D-12).
+- Meeting line: "The tool's description is the agent's instruction manual; it says when to use the tool, when not to, and what to do with every result."
+- Exam link: TS 2.1
+- Built 2026-11-05 with /new-tool: data/shop.ts (fictional), lib/tools/store.ts (in-memory, Neon later), verify_customer.ts + test (8 tests). Full suite 23/23 pass (local run).
