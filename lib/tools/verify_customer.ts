@@ -107,7 +107,7 @@ function lockedResult(s: Exclude<ReturnType<typeof gate>, { kind: "open" }>, now
       ok: false,
       locked: true,
       unlock_in_minutes: Math.ceil((s.unlockAt - now) / MIN),
-      next_step: `Too many attempts. Tell the customer they can try again in about ${Math.ceil((s.unlockAt - now) / MIN)} minutes, or contact the shop by email.`,
+      next_step: `Too many verification attempts. Tell the customer they can try again in about ${Math.ceil((s.unlockAt - now) / MIN)} minutes, or contact the shop by email.`,
     };
   }
   return {
