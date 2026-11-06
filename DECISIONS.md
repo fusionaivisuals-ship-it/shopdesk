@@ -285,3 +285,9 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Meeting line: "The agent chooses its tools, but every tool checks the rules itself, so a wrong choice costs a retry, never a data leak."
 - Exam link: TS 2.3 (tool_choice auto/any/forced; scoped tool sets)
 - D2 S3 exam Q (owner tools added to the live agent behind a prompt): answered B correctly. Niel: a prompt-only guard means someone can try to talk the bot into reaching personal information.
+
+## D-32 MCP servers: B (Neon's official MCP for database work + a small custom ShopDesk MCP server exposing only ShopDesk's own tools) — 2026-11-07
+- Why (Niel): A (custom server for everything) is a waste of time. C (Neon only, query the database directly) goes past all the verification I built for a specific reason.
+- Effect: testing from Claude uses the same tools as the live agent (same locks, trimmed fields, structured errors).
+- Meeting line: "We use maintained servers for standard integrations and build our own only for logic that is ours; testing goes through the same rules customers hit."
+- Exam link: TS 2.4 (community/official servers vs custom)
