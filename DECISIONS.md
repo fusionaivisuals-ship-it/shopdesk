@@ -291,3 +291,9 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Effect: testing from Claude uses the same tools as the live agent (same locks, trimmed fields, structured errors).
 - Meeting line: "We use maintained servers for standard integrations and build our own only for logic that is ours; testing goes through the same rules customers hit."
 - Exam link: TS 2.4 (community/official servers vs custom)
+
+## D-33 ShopDesk MCP config: A (project .mcp.json, secret as ${SHOPDESK_DATABASE_URL}) — 2026-11-07
+- Why (Niel): it's a project that may have to be shared. Personal config (B) only works short term and causes problems when going live or duplicating it. Pasting the real string (C) puts my keys in public.
+- Meeting line: "The server config is shared in git; each person's credentials come from their own environment, so nothing secret is ever committed."
+- Exam link: TS 2.4 (.mcp.json scoping + env var expansion)
+- Built 2026-11-07: mcp/shopdesk-server.ts (verify_customer, list_orders over MCP, same rules as live agent) + .mcp.json with ${SHOPDESK_DATABASE_URL}. Smoke test over stdio: list before verify -> permission error; wrong details -> generic no_match; correct -> verified; list -> 2 orders, summary fields only. Storage still in-memory (env var used from the Neon session on).

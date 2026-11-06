@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "shopdesk": {
+      "command": "npx",
+      "args": ["tsx", "mcp/shopdesk-server.ts"],
+      "env": { "SHOPDESK_DATABASE_URL": "${SHOPDESK_DATABASE_URL}" }
+    }
+  }
+}
