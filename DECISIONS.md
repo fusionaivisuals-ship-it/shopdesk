@@ -322,3 +322,4 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Adaptive inside: Claude chooses which tools, in which order, based on what each result shows (D-31 tool_choice auto).
 - Meeting line: "Everything that must always happen is code around the conversation; only the conversation itself is left to the model."
 - Exam link: TS 1.6 (fixed pipeline vs adaptive decomposition)
+- D1 S1 exam Q (40-file audit missed cross-file leaks): answered B correctly. Niel's reasons: A and D suffer the lost-in-the-middle effect (D keeps missing the actual problem); C misses small mistakes that cause bigger ones later.
