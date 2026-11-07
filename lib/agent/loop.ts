@@ -6,7 +6,7 @@ import type { Context } from "../tools/verify_customer";
 import { verifyCustomer, definition as verifyDef } from "../tools/verify_customer";
 import { listOrders, definition as listDef } from "../tools/list_orders";
 import { reportReaction, definition as reactionDef, SAFETY_MESSAGE } from "../tools/report_reaction";
-import { beforeTool } from "./hooks";
+import { beforeTool, reactionReported } from "./hooks";
 
 // The slice of the Anthropic Messages API the loop needs. Injected so tests can script it.
 export type Block =
@@ -27,6 +27,9 @@ const TOOLS: Record<string, { definition: unknown; run: Tool }> = {
 };
 
 export const MAX_ROUNDS = 8;
+// D-39b: after a reaction report, code answers every later message itself; Claude is not called.
+export const AFTER_REACTION_REPLY =
+  "A member of the Glow & Co team will contact you today about this. If your symptoms get worse, please seek medical help.";
 export const FALLBACK =
   "Sorry, I couldn't finish that just now. Please use the \"Talk to a person\" button and someone from Glow & Co will help.";
 
@@ -45,6 +48,12 @@ export async function runTurn(args: {
   store: Store;
 }): Promise<TurnResult> {
   const messages = [...args.history];
+  // Fixed-shell rule (D-36, D-39b): once a reaction was reported earlier in this conversation,
+  // no model call at all: no advice can be written, and the reply costs $0.
+  if (reactionReported(args.history)) {
+    messages.push({ role: "assistant", content: [{ type: "text", text: AFTER_REACTION_REPLY }] });
+    return { reply: AFTER_REACTION_REPLY, messages, rounds: 0, endedBy: "end_turn" };
+  }
   const tools = Object.values(TOOLS).map((t) => t.definition);
 
   for (let round = 1; round <= MAX_ROUNDS; round++) {

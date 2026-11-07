@@ -353,3 +353,8 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Exam link: TS 1.5 (PreToolUse interception for guaranteed compliance)
 - Built 2026-11-07: lib/tools/report_reaction.ts (full description, urgent ticket via buildTicket), lib/agent/hooks.ts (beforeTool), loop wired: every tool call passes the hook; after a reaction, the turn's reply is the FIXED safety message even if the model wrote advice. Tests: hooks.test.ts (4). Suite 41 passed, 1 skipped.
 - KNOWN GAP (to decide): the hook blocks TOOLS after a reaction, not TEXT. In a later turn the model could still write product advice without calling a tool. Option to decide next: after a reaction, code answers every later message itself ("a person will contact you") without calling Claude.
+
+## D-39b After a reaction report: B (code answers every later message itself; Claude is not called) — 2026-11-07
+- Why (Niel): Claude guided by the tool result (A) is 9/10, too little when wrong advice can cause problems; a second checker (C) can still let mistakes through (note: that checker would be a model, not code, so it is probabilistic too).
+- Built: runTurn checks the conversation before any model call; after a reaction it returns a fixed reply ("a member of the team will contact you today... seek medical help if symptoms get worse"), $0, no advice possible. Closes the KNOWN GAP above. Test: Claude receives zero calls on the later message; still one ticket. Suite 41 passed, 1 skipped.
+- Meeting line: "After a reaction report the AI is switched off for that conversation; only fixed, approved wording reaches the customer until a person takes over."

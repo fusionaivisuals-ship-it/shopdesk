@@ -1,6 +1,6 @@
 // Hook + report_reaction tests (D-08, D-38, D-39). Scripted Claude, fictional data, $0.
 import { describe, it, expect } from "vitest";
-import { runTurn, type Claude, type ClaudeReply, type Message } from "./loop";
+import { runTurn, AFTER_REACTION_REPLY, type Claude, type ClaudeReply, type Message } from "./loop";
 import { beforeTool } from "./hooks";
 import { memoryStore } from "../tools/store";
 import { SAFETY_MESSAGE } from "../tools/report_reaction";
@@ -42,20 +42,18 @@ describe("report_reaction + conversation hook", () => {
     expect(store.logs).toContainEqual(expect.objectContaining({ event: "tool_blocked_by_hook", tool: "list_orders" }));
   });
 
-  it("...and in LATER turns of the same conversation", async () => {
+  it("later messages after a reaction: code answers itself, Claude is NOT called (D-39b)", async () => {
     const store = memoryStore();
     const first = scripted([
       { stop_reason: "tool_use", content: [use("r1", "report_reaction", { what_happened: "redness" })] },
       { stop_reason: "end_turn", content: [text("x")] },
     ]);
     const t1 = await runTurn({ claude: first.claude, system: "", history: [{ role: "user", content: "redness" }], ctx, store });
-    const second = scripted([
-      { stop_reason: "tool_use", content: [use("v1", "verify_customer", { email: "mei.lin@example.com", order_number: "GC-1042" })] },
-      { stop_reason: "end_turn", content: [text("A person will contact you.")] },
-    ]);
-    const t2 = await runTurn({ claude: second.claude, system: "", history: [...t1.messages, { role: "user", content: "ok can you check my order" }], ctx, store });
-    expect(await store.getVerifiedCustomer("conv_1")).toBeNull(); // verify_customer never ran
-    expect(t2.reply).toBe("A person will contact you."); // later turns aren't forced to repeat the safety message
+    const second = scripted([]); // any call would throw "script ran out"
+    const t2 = await runTurn({ claude: second.claude, system: "", history: [...t1.messages, { role: "user", content: "should I use retinol instead?" }], ctx, store });
+    expect(t2.reply).toBe(AFTER_REACTION_REPLY);
+    expect(second.seen).toHaveLength(0); // no model call -> no advice possible, $0
+    expect(store.tickets).toHaveLength(1); // no duplicate ticket
   });
 
   it("before any reaction, tools are allowed; tools added later are covered automatically", () => {
