@@ -315,3 +315,10 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Real-database check via the MCP server: verification persisted across server restarts. Found a bug the in-memory tests could not see: order dates shifted one day early (timezone conversion). Fixed (dates read as text); added lib/tools/store.neon.test.ts, which runs only when SHOPDESK_DATABASE_URL is set (skipped in normal runs/CI, $0). With the real database: 27/27.
 - Lesson (TS 5.5-ish): tests on a fake store prove the logic, not the real storage; keep at least one integration test against the real thing.
 - 2026-11-07 15:22 Taipei: database password reset (it had appeared in session tool output; never in files or git). Old password verified rejected. Deploy plan: connect the Neon store to the Vercel project in the Vercel dashboard so Vercel injects the connection string itself; the secret then never passes through chat or files.
+
+## D-36 Chat turn structure: C (fixed code shell + adaptive Claude loop inside) — 2026-11-07
+- Why (Niel): a fully fixed pipeline (A) breaks when people ask several questions at once; fully adaptive (B) depends on the LLM making the right choice every time. C removes the problems of both.
+- Fixed shell (code, every turn): spend cap check (D-12) -> load conversation + verified flag (D-02b) -> [agent loop] -> save messages -> log.
+- Adaptive inside: Claude chooses which tools, in which order, based on what each result shows (D-31 tool_choice auto).
+- Meeting line: "Everything that must always happen is code around the conversation; only the conversation itself is left to the model."
+- Exam link: TS 1.6 (fixed pipeline vs adaptive decomposition)
