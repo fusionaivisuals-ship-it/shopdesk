@@ -426,3 +426,9 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - v3 (Niel: "fix all"): an independent reviewer found 12 issues; 10 fixed, 2 kept with reasons (see web/hero/REHEARSAL.md). The widget now sits on the shop's own page. Gates pass at 1280 and 390; live check 0 dropped frames.
 - Meeting line: "A builder grading its own work misses things, so a separate reviewer that never saw my reasons judged the frames, and I fixed or answered every finding."
 - Exam link: Domain 1 (independent review by a subagent without the builder's context), Domain 5 (verification before claiming done).
+
+## D-48 "How it's built" cards: A + C (rules in code; spend cap), joining the safety handoff and break-it cards — 2026-11-08
+- Choice: Niel picked A (business rules live in code, not the prompt) and C (daily spend cap).
+- Rejected: B (trimmed tool data) becomes one line on the A card instead of its own card; D (CI review bot) speaks to developers more than shop owners.
+- Meeting line (Claude's suggestion, Niel to confirm or reword): "A shows the core idea: Claude handles the language, code makes the decisions. C answers the first thing a business asks: what can this cost me?"
+- Exam link: Domain 1 (code-enforced gates over prompt instructions), Domain 5 (reliability and cost limits in production).
