@@ -387,3 +387,9 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Domain 1 build complete (TS 1.1-1.7).
 - D1 S7 exam Q (resumed session answers from stale reads): answered B correctly. Niel: D can be costly but may be needed if there are many changes. That is the exam's own rule: resume + name the changed files when most context is still valid; start fresh with a structured summary when much has changed.
 - DOMAIN 1 COMPLETE: 7/7 exam questions correct.
+
+## D-43 search_policy failures: B (apply D-30: "no match" = normal result, outage = transient error) — 2026-11-08
+- Why (Niel): A works but he doesn't like the message it gives during an outage; B is probably best. For anything the policies don't cover, the right outcome is a support person (Niel), which both paths already do.
+- Updates D-11: an outage no longer looks like "not in our policies"; the trial count of policy gaps only contains real gaps.
+- Paths: found:false -> "that isn't covered in our policies" + Talk to a person. transient error -> retry once, then "our policies can't be loaded right now" + Talk to a person.
+- Meeting line: "Every tool follows the same rule: an outage is never mistaken for 'no answer', and anything we can't answer goes to a person."
