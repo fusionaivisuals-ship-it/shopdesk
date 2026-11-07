@@ -359,3 +359,10 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Built: runTurn checks the conversation before any model call; after a reaction it returns a fixed reply ("a member of the team will contact you today... seek medical help if symptoms get worse"), $0, no advice possible. Closes the KNOWN GAP above. Test: Claude receives zero calls on the later message; still one ticket. Suite 41 passed, 1 skipped.
 - Meeting line: "After a reaction report the AI is switched off for that conversation; only fixed, approved wording reaches the customer until a person takes over."
 - D1 S4 exam Q (mixed timestamp/status formats from tools we can't change): answered C correctly (PostToolUse normalisation). Contrast with D-30: fix at the source when you own the tool and information would be lost; use an after-tool hook when the data is all there but in inconsistent formats and you can't change the tool.
+
+## D-40 Weekly "what went wrong" investigation: C (coordinator picks subagents per chat, combines, chases gaps) — 2026-11-07
+- Why (Niel): one agent over 30 transcripts (A) suffers lost-in-the-middle; the fixed full pipeline (B) is costly, though it could be an option at high volume if run overnight at lower cost; C may still have problems, but fewer.
+- Note on "cheaper overnight": the saving comes from the Batch API (about half price, results within 24h, Domain 4.5), not from the time of day; overnight runs are where batching fits naturally.
+- Offline only (never in the live chat, D-36). Built once real chats exist; designing it now, the subagent handoff format comes in TS 1.3.
+- Meeting line: "The investigator spends effort where each failure needs it and keeps asking until the report has no gaps."
+- Exam link: TS 1.2
