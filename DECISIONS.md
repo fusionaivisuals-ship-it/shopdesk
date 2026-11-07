@@ -366,3 +366,4 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Offline only (never in the live chat, D-36). Built once real chats exist; designing it now, the subagent handoff format comes in TS 1.3.
 - Meeting line: "The investigator spends effort where each failure needs it and keeps asking until the report has no gaps."
 - Exam link: TS 1.2
+- D1 S5 exam Q (investigator missed opened-product returns): answered C correctly. Reasoning: subagents did what they were assigned; synthesis can only combine what it receives; the coordinator's split was too narrow and it never checked for gaps.
