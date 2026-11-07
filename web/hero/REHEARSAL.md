@@ -12,5 +12,7 @@ Filmed 2026-11-08, Chromium 1243 headless, virtual clock:
 - Gate at 390: rehearsal passed.
 - Fixed during rehearsal: typed question overran the field; uneven gutters on phones (panel bleed); tool list hop on landing; tight name/result stack on phones; source chip cut by the phone crop.
 
-Not checked: dark theme; real phone browser frame rate; independent fresh-eye review.
-Known: on desktop there's ~60px of air above the greeting at the poster frame.
+Not checked: dark theme (page is light-only for now); a real iPhone in Safari. Independent fresh-eye review: see below.
+Fixed 2026-11-08 (later): the air above the greeting on desktop (stage 640x412).
+
+Live check (real clock, Chromium emulating iPhone 13, and desktop 1280): plays to the end, median frame 16.7ms, 0 frames over 50ms, 0 console errors. Not a real iPhone/Safari.

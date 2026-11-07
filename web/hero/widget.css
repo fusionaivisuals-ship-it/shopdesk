@@ -19,7 +19,7 @@
 
 /* The widget panel: pinned top, sides at a gutter, running off the bottom */
 .sdw .sdw-panel {
-  position: absolute; top: 28px; left: 70px; width: 500px; height: 472px;
+  position: absolute; top: 28px; left: 70px; width: 500px; height: 436px;
   display: grid; grid-template-rows: auto 1fr;
   background: var(--ss-surface); border-radius: 22px;
   box-shadow: var(--ss-shadow-hero); overflow: hidden;
@@ -31,7 +31,7 @@
 .sdw .sdw-brand { font-family: var(--sdw-serif); font-size: 19px; letter-spacing: 0.01em; color: var(--ss-text-strong); }
 .sdw .sdw-online { flex: none; }
 
-.sdw .sdw-body { display: grid; grid-template-rows: 1fr auto; min-height: 0; padding: 14px 20px 72px; }
+.sdw .sdw-body { display: grid; grid-template-rows: 1fr auto; min-height: 0; padding: 10px 20px 64px; }
 .sdw .sdw-thread { display: flex; flex-direction: column; justify-content: flex-end; gap: 12px; min-height: 0; padding-bottom: 16px; overflow: hidden; }
 .sdw .sdw-greet { font-size: 13px; line-height: 1.5; color: var(--ss-text); }
 

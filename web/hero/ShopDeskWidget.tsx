@@ -61,7 +61,7 @@ export function ShopDeskWidget({ look }: { look: Look }) {
   return (
     <Stage
       width={640}
-      height={448}
+      height={412}
       compact={{ below: 600, width: 358, height: 404 }}
       initial={initial}
       poster={poster}
