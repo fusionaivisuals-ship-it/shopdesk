@@ -3,6 +3,7 @@
 // Nothing in this file is decided by the model.
 import type { Store } from "../tools/store";
 import { runTurn, type Claude, type Message } from "./loop";
+import type { Step } from "./steps";
 import { checkBudget, costCents, taipeiDay } from "../rules/budget";
 
 export const SYSTEM_PROMPT = `You are the support assistant for Glow & Co, a skincare shop. You help with Glow & Co orders and policies only (D-13).
@@ -22,6 +23,7 @@ export async function handleMessage(args: {
   visitorId: string;
   text: string;
   now: number;
+  onStep?: (step: Step) => void | Promise<void>; // D-50
 }): Promise<MessageResult> {
   const { store, conversationId, visitorId, now } = args;
   const day = taipeiDay(now);
@@ -45,6 +47,7 @@ export async function handleMessage(args: {
     history: [...history, userMsg],
     ctx: { conversationId, visitorId, now },
     store,
+    onStep: args.onStep,
   });
 
   // 4. Save everything new this turn (user message, tool calls, tool results, reply).

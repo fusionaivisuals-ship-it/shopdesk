@@ -9,6 +9,7 @@ import { reportReaction, definition as reactionDef, SAFETY_MESSAGE } from "../to
 import { beforeTool, reactionReported } from "./hooks";
 import { searchPolicy, definition as searchDef } from "../tools/search_policy";
 import { readPolicy, definition as readDef } from "../tools/read_policy";
+import { stepLabel, type Step } from "./steps";
 
 // The slice of the Anthropic Messages API the loop needs. Injected so tests can script it.
 export type Block =
@@ -51,6 +52,7 @@ export async function runTurn(args: {
   history: Message[]; // previous turns + the new customer message
   ctx: Context;
   store: Store;
+  onStep?: (step: Step) => void | Promise<void>; // D-50: one event per tool call, label built by code (D-51)
 }): Promise<TurnResult> {
   const messages = [...args.history];
   const usage = { input_tokens: 0, output_tokens: 0 };
@@ -93,16 +95,19 @@ export async function runTurn(args: {
           is_error: true,
           content: JSON.stringify({ isError: true, category: "validation", retryable: false, next_step: `No tool named ${b.name}. Use one of: ${Object.keys(TOOLS).join(", ")}.` }),
         });
+        await args.onStep?.(stepLabel(b.name, null));
         continue;
       }
       const hook = beforeTool(b.name, messages); // D-39: conversation-wide rules, every tool
       if (!hook.allow) {
         await args.store.log({ event: "tool_blocked_by_hook", tool: b.name, conversationId: args.ctx.conversationId });
         results.push({ type: "tool_result", tool_use_id: b.id, is_error: true, content: JSON.stringify(hook.result) });
+        await args.onStep?.({ tool: b.name, label: "Skipped", ok: false });
         continue;
       }
       const out: any = await tool.run(b.input ?? {}, args.ctx, args.store, messages);
       results.push({ type: "tool_result", tool_use_id: b.id, content: JSON.stringify(out), is_error: out?.isError === true });
+      await args.onStep?.(stepLabel(b.name, out));
     }
     // Tool results go back as the next user message, matched by tool_use_id.
     messages.push({ role: "user", content: results });

@@ -445,3 +445,13 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Consequence: the real chat now matches what the hero animation promises.
 - Open safety points (to decide next): what each step label may show (D-04/D-06 limits), and the D-08 fixed safety message must never be streamed over by Claude's own wording.
 - Exam link: Domain 1 (each tool_use round of the stop_reason loop is a natural event to send).
+
+## D-51 Step labels: B, written by code from whitelisted result words; every failure is generic — 2026-11-08
+- Why (Niel): "B would be best; A is good but a bit short."
+- Rejected: A (fixed labels only; safe but says too little), C (Claude writes labels; a prompt rule is a request, not a guarantee, breaks D-02b).
+- Rules (lib/agent/steps.ts): verify -> "Verified" or "Couldn't confirm" (same for no-match and locked, D-04); list_orders -> order number + status only (D-06 fields), or a count; policy tools -> title + version; report_reaction -> "Passed to our team". Any error -> a fixed "Couldn't ..." line. Unknown tool or hook block -> "Skipped".
+- Proof: steps.test.ts feeds each tool a result full of extra fields and checks none appear in the label.
+- Claude's call (engineering default, not a new rule): the answer text is sent whole after the loop ends, not token by token, so the D-08 fixed safety message can never be streamed over by Claude's own words. The browser reveals it word by word.
+- Exam link: Domain 2 (tools return only what's needed; that covers anything built from a tool result).
+- Built 2026-11-08 (D-49/D-50/D-51): lib/agent/steps.ts (+11 tests), loop/turn send a step per tool call (+3 tests), lib/agent/claude.ts (real client; model a setting, default claude-haiku-5-5, NOT yet verified against the live API), lib/server.ts (store, server-issued httpOnly visitor + conversation cookies so nobody can join a conversation someone else verified), app/api/chat (event stream), app/api/handoff (D-09 button, code only), app/page.tsx + Chat.tsx (Botanical look). Checked with a local fake Claude server through the real SDK: steps Verified / 2 orders / Shipping, v1, then the answer; browser check at 390 and 1280, 0 errors. Suite 73 passed, 1 skipped. Not deployed.
+- Open: hero says "GC-1043 shipped" but mei.lin has 2 orders, so the real label is "2 orders" (hero to match real data, or data to match hero). Handoff button has no server-side limit yet (one ticket per conversation proposed).

@@ -1,0 +1,42 @@
+/* Botanical look (D-47). Same tokens as web/hero/widget.css. */
+:root {
+  --surface: #fbf7ef; --page: #f4efe3; --accent: #2f5d46; --accent-soft: #e3ebe2;
+  --strong: #1f2a24; --text: #66705f; --line: rgba(40, 60, 45, 0.14);
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--strong); font: 15px/1.5 var(--sans); }
+.page { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; }
+.nav { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.mark { font-family: var(--serif); font-size: 22px; }
+.demo { font-size: 12.5px; color: var(--text); }
+.intro h1 { font-family: var(--serif); font-weight: 400; font-size: 30px; margin: 32px 0 6px; }
+.intro p { margin: 0 0 20px; color: var(--text); }
+.intro b { color: var(--strong); font-weight: 600; }
+
+.chat { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 18px 40px rgba(31, 42, 36, 0.08); display: flex; flex-direction: column; height: min(620px, 78vh); overflow: hidden; }
+.chat-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+.chat-title { font-family: var(--serif); font-size: 18px; }
+.person { border: 1px solid var(--accent); background: transparent; color: var(--accent); border-radius: 999px; padding: 6px 14px; font: 600 13px var(--sans); cursor: pointer; }
+.person:disabled { opacity: 0.6; cursor: default; }
+.thread { flex: 1; overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
+.greeting, .notice { margin: 0; color: var(--text); font-size: 14px; }
+.notice { background: var(--accent-soft); color: var(--accent); padding: 10px 14px; border-radius: 12px; }
+.q { align-self: flex-end; max-width: 80%; background: var(--accent-soft); padding: 10px 14px; border-radius: 16px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.a { display: flex; flex-direction: column; gap: 8px; }
+.steps { list-style: none; margin: 0; padding: 2px 0 2px 12px; border-left: 2px solid var(--line); display: flex; flex-direction: column; gap: 4px; }
+.steps li { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--text); animation: in 200ms ease-out; }
+.steps code { font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--strong); }
+.steps .dot { width: 16px; height: 16px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 10px; background: var(--accent); color: #fff; flex: none; }
+.steps .no .dot { background: var(--line); color: var(--strong); }
+.answer { margin: 0; font-size: 15px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.working { margin: 0; color: var(--text); font-size: 14px; animation: pulse 1.2s ease-in-out infinite; }
+.composer { display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--line); }
+.composer input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 999px; padding: 10px 16px; font: 16px var(--sans); background: #fff; color: var(--strong); }
+.composer input:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+.composer button { border: 0; border-radius: 999px; padding: 0 18px; background: var(--accent); color: #fff; font: 600 14px var(--sans); cursor: pointer; }
+.composer button:disabled { opacity: 0.45; cursor: default; }
+@keyframes in { from { opacity: 0; transform: translateY(4px); } }
+@keyframes pulse { 50% { opacity: 0.5; } }
+@media (prefers-reduced-motion: reduce) { .steps li, .working { animation: none; } }

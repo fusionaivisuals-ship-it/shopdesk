@@ -94,3 +94,38 @@ describe("agent loop", () => {
     expect(store.logs).toContainEqual(expect.objectContaining({ event: "loop_unexpected_stop", stop_reason: "max_tokens" }));
   });
 });
+
+// D-50/D-51: one step event per tool call, labels built by code.
+describe("agent loop step events", () => {
+  it("verify -> list sends two steps in order, with safe labels", async () => {
+    const steps: any[] = [];
+    const { claude } = scripted([
+      { stop_reason: "tool_use", content: [use("t1", "verify_customer", { email: "mei.lin@example.com", order_number: "GC-1042" })] },
+      { stop_reason: "tool_use", content: [use("t2", "list_orders")] },
+      { stop_reason: "end_turn", content: [text("You have 2 orders.")] },
+    ]);
+    await runTurn({ claude, system: "", history: ask("What have I ordered?"), ctx, store: memoryStore(), onStep: (s) => { steps.push(s); } });
+    expect(steps.map((s) => s.tool)).toEqual(["verify_customer", "list_orders"]);
+    expect(steps[0]).toEqual({ tool: "verify_customer", label: "Verified", ok: true });
+    expect(steps[1].label).toBe("2 orders");
+  });
+
+  it("a wrong email shows only the generic step (D-04)", async () => {
+    const steps: any[] = [];
+    const { claude } = scripted([
+      { stop_reason: "tool_use", content: [use("t1", "verify_customer", { email: "someone@example.com", order_number: "GC-1042" })] },
+      { stop_reason: "end_turn", content: [text("Those details don't match our records.")] },
+    ]);
+    await runTurn({ claude, system: "", history: ask("order GC-1042"), ctx, store: memoryStore(), onStep: (s) => { steps.push(s); } });
+    expect(steps).toEqual([{ tool: "verify_customer", label: "Couldn't confirm", ok: false }]);
+  });
+
+  it("no onStep given -> loop works as before", async () => {
+    const { claude } = scripted([
+      { stop_reason: "tool_use", content: [use("t1", "search_policy", { query: "ship to Japan" })] },
+      { stop_reason: "end_turn", content: [text("Yes.")] },
+    ]);
+    const r = await runTurn({ claude, system: "", history: ask("Japan?"), ctx, store: memoryStore() });
+    expect(r.reply).toBe("Yes.");
+  });
+});
