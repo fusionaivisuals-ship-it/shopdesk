@@ -323,3 +323,10 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Meeting line: "Everything that must always happen is code around the conversation; only the conversation itself is left to the model."
 - Exam link: TS 1.6 (fixed pipeline vs adaptive decomposition)
 - D1 S1 exam Q (40-file audit missed cross-file leaks): answered B correctly. Niel's reasons: A and D suffer the lost-in-the-middle effect (D keeps missing the actual problem); C misses small mistakes that cause bigger ones later.
+
+## D-37 Loop stop rule: B (continue on stop_reason "tool_use", stop on "end_turn"; safety cap 8 rounds as a backstop only) — 2026-11-07
+- Why (Niel): A (stop when there's text) can stop before the loop is finished and send a possibly made-up answer; C (always 3 rounds) leaves detailed questions unanswered. B is mostly hard-coded and still has a stop for endless loops.
+- Cap behaviour: hitting 8 rounds is an ERROR path: honest fallback message pointing to "Talk to a person" + staff-log entry. Any other stop_reason (e.g. max_tokens, refusal) takes the same path.
+- Meeting line: "The model's own stop signal ends the loop; the round limit only exists to catch a broken loop, and it says so honestly when it fires."
+- Exam link: TS 1.1 (stop_reason, tool results appended, anti-patterns)
+- Built 2026-11-07: lib/agent/loop.ts + loop.test.ts (7 tests, scripted Claude, $0). Proves: text+tool_use doesn't stop the loop; tool results return with matching tool_use_id; tool errors reach Claude as is_error; unknown tool -> error result; cap 8 -> honest fallback + log; max_tokens -> fallback + log. Suite 33 passed, 1 skipped (DB integration test).
