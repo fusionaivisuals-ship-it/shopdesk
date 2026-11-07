@@ -40,3 +40,7 @@ body { margin: 0; background: var(--page); color: var(--strong); font: 15px/1.5 
 @keyframes in { from { opacity: 0; transform: translateY(4px); } }
 @keyframes pulse { 50% { opacity: 0.5; } }
 @media (prefers-reduced-motion: reduce) { .steps li, .working { animation: none; } }
+.unlock { display: flex; gap: 8px; max-width: 420px; }
+.unlock input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 999px; padding: 10px 16px; font: 16px var(--sans); background: #fff; }
+.unlock button { border: 0; border-radius: 999px; padding: 0 18px; background: var(--accent); color: #fff; font: 600 14px var(--sans); cursor: pointer; }
+.unlock-wrong { color: #8e3b3b; margin-top: 10px; }
