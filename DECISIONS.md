@@ -375,3 +375,13 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Exam link: TS 1.3 (explicit context, structured content vs metadata), 5.6 (provenance)
 - Built 2026-11-07: lib/investigate/findings.ts + test (3): subagentTask() writes goal, chats, constraints and prior findings (with sources) into the task; code rejects findings without a source; merging keeps conflicting findings side by side. Suite 44 passed, 1 skipped.
 - D1 S6 exam Q (subagent ignored a constraint discussed with the coordinator): answered D correctly. Notes: B (fork) copies the whole discussion and its noise; forking is for exploring different approaches from one starting point, not for passing context. C's main flaw is 'if they need it': the subagent doesn't know the rule exists, so it won't go looking.
+
+## D-42 Returning customer: C (fresh conversation, re-verify, then a code-made summary of recent contact; no old tool results) — 2026-11-07
+- Why (Niel): resuming (A) means trusting old verification, which is scary; a completely fresh start (B) is a good idea but can irritate customers. C re-checks the customer and the order.
+- Niel's limit: don't keep it longer than 48 hours. Read as: only contact from the last 48 hours is summarised (Niel to correct if he meant something else).
+- Rules: the summary is added only AFTER verification as the same customer (a different person on the same browser sees nothing); it holds facts from records (tickets, their status, orders mentioned), never old tool results; current order data always comes from a fresh tool call.
+- Current limit: chat messages aren't stored yet, so for now the summary covers recent tickets only.
+- Meeting line: "Returning customers re-verify, then the agent gets a short factual note of the last 48 hours; anything current is looked up again, never remembered."
+- Exam link: TS 1.7 (fresh start with structured summary vs resuming with stale tool results)
+- Built 2026-11-07: lib/agent/returning.ts + test (4); verify_customer adds recent_contact only on success. Store: recentTicketsFor (SQL checked read-only on Neon). Proves: last-48h contact included after verification; older not carried; nothing shown before verification; a new chat is never verified because an old one was. Suite 48 passed, 1 skipped.
+- Domain 1 build complete (TS 1.1-1.7).

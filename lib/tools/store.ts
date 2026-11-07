@@ -26,6 +26,7 @@ export type Store = {
   setVerifiedCustomer(conversationId: string, customerId: string): Promise<void>;
   createTicket(t: Ticket): Promise<void>;
   ticketCountsByKind(customerId: string, sinceMs: number): Promise<Record<string, number>>; // D-38b
+  recentTicketsFor(customerId: string, sinceMs: number): Promise<Ticket[]>; // D-42
   log(entry: Record<string, unknown>): Promise<void>; // staff only, never shown to Claude (D-04)
 };
 
@@ -48,6 +49,7 @@ export function memoryStore(opts: { down?: boolean } = {}): Store & { tickets: T
     getVerifiedCustomer: async (id) => verified.get(id) ?? null,
     setVerifiedCustomer: async (id, cus) => void verified.set(id, cus),
     createTicket: async (t) => void tickets.push(t),
+    recentTicketsFor: async (cus, since) => tickets.filter((t) => t.customerId === cus && t.createdAt >= since),
     ticketCountsByKind: async (cus, since) => {
       const counts: Record<string, number> = {};
       for (const t of tickets) if (t.customerId === cus && t.createdAt >= since) counts[t.kind] = (counts[t.kind] ?? 0) + 1;
@@ -105,6 +107,14 @@ export function neonStore(databaseUrl: string): Store {
       await sql`INSERT INTO tickets (kind, order_number, conversation_id, customer_id, priority, details, created_at)
                 VALUES (${t.kind}, ${(t.details.orderNumber as string) ?? null}, ${t.conversationId}, ${t.customerId},
                         ${t.priority}, ${JSON.stringify(t.details)}::jsonb, ${new Date(t.createdAt).toISOString()})`;
+    },
+    async recentTicketsFor(cus, since) {
+      const rows = await sql`SELECT kind, priority, conversation_id, customer_id, details, status, created_at FROM tickets
+                             WHERE customer_id = ${cus} AND created_at >= ${new Date(since).toISOString()} ORDER BY created_at`;
+      return rows.map((r: any) => ({
+        kind: r.kind, priority: r.priority, conversationId: r.conversation_id, customerId: r.customer_id,
+        createdAt: new Date(r.created_at).getTime(), details: { ...r.details, status: r.status },
+      }));
     },
     async ticketCountsByKind(cus, since) {
       const rows = await sql`SELECT kind, count(*)::int AS n FROM tickets

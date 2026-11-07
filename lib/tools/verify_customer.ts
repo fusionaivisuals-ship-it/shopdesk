@@ -2,6 +2,7 @@
 // D-04 (generic result + next step), D-29 (full description with sample messages).
 import { gate, recordFailure, recordSuccess, LIMITS } from "../rules/lock";
 import type { Store } from "./store";
+import { recentContactSummary } from "../agent/returning";
 
 export const definition = {
   name: "verify_customer",
@@ -39,7 +40,7 @@ EXAMPLES:
 export type Context = { conversationId: string; visitorId: string; now: number };
 
 export type VerifyResult =
-  | { ok: true; next_step: string }
+  | { ok: true; next_step: string; recent_contact?: string }
   | { ok: false; reason: "no_match"; attempts_left: number; next_step: string }
   | { ok: false; locked: true; unlock_in_minutes: number | null; next_step: string };
 
@@ -73,7 +74,13 @@ export async function verifyCustomer(
     await store.setCounter(orderKey!, s.order);
     await store.setCounter(visitorKey, s.visitor);
     await store.setVerifiedCustomer(ctx.conversationId, order.customerId);
-    return { ok: true, next_step: "Verified. Use list_orders to see this customer's orders." };
+    // D-42: only now, after verification as this customer, recent contact is shared with Claude.
+    const recent = await recentContactSummary(store, order.customerId, ctx.conversationId, ctx.now);
+    return {
+      ok: true,
+      next_step: "Verified. Use list_orders to see this customer's orders.",
+      ...(recent ? { recent_contact: recent } : {}),
+    };
   }
 
   // Detailed reason goes to the staff log only, never to Claude (D-04).
