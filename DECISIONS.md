@@ -301,3 +301,12 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - D2 S5 (TS 2.5) practical on the real repo: 4/5. Grep found 3 callers of recordFailure( (a name-based search found 0); Glob found 3 test files; Grep located LIMITS at lock.ts:8, then Read only lines 8-14; Grep located the message, Edit changed one unique string; #5 'run the tests' is Bash (Niel said Read). Tests 26/26.
 - D2 S5 exam Q (Edit fails: text not unique): answered C correctly. Note: Bash is not only for tests; sed is wrong here because it changes every occurrence, including the one that must stay.
 - Domain 2 complete (TS 2.1-2.5): 5/5 exam questions correct.
+
+## D-34 Database tables (approved plan) — 2026-11-07
+- New, separate Neon project "shopdesk" (free plan, $0). Six tables, only for what is built: customers (D-02), orders (D-05), conversations with verified customer (D-02b), attempt_counters (D-03b, D-21), tickets (D-14b), staff_log (D-04, D-30). Products, order items and policies come later with get_order / search_policy.
+
+## D-35 Region: C (database in Singapore + Vercel functions moved to Singapore) — 2026-11-07
+- Why (Niel): test-run it. A (Singapore DB, US code) causes slow replies, especially while people are testing; B (US East everything) is a long-term problem for a Taiwan/Asia-focused product.
+- Rule behind it: put the database next to the code that queries it (several queries per chat turn); then put both near the users.
+- To verify at deploy time: whether the Vercel plan allows setting the function region to Singapore.
+- Meeting line: "Database and server sit together in Singapore, next to our users, so a chat turn's many database calls stay fast."
