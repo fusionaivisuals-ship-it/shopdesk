@@ -330,3 +330,4 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Meeting line: "The model's own stop signal ends the loop; the round limit only exists to catch a broken loop, and it says so honestly when it fires."
 - Exam link: TS 1.1 (stop_reason, tool results appended, anti-patterns)
 - Built 2026-11-07: lib/agent/loop.ts + loop.test.ts (7 tests, scripted Claude, $0). Proves: text+tool_use doesn't stop the loop; tool results return with matching tool_use_id; tool errors reach Claude as is_error; unknown tool -> error result; cap 8 -> honest fallback + log; max_tokens -> fallback + log. Suite 33 passed, 1 skipped (DB integration test).
+- D1 S2 exam Q (loop stops on 'any text'): answered B correctly. Niel's extra point on C: a fixed 3-round limit leaves no room for recovery steps such as retrying a temporarily unavailable API (D-30 'retry once' needs a round).
