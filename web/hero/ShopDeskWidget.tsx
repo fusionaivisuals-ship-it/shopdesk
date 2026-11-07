@@ -14,7 +14,7 @@ const A = "Your order GC-1043 has shipped and is on its way. And yes, we ship to
 const WORDS = A.split(" ").length;
 const STEPS = [
   { tool: "verify_customer", result: "Verified" },
-  { tool: "list_orders", result: "GC-1043 shipped" },
+  { tool: "list_orders", result: "2 orders" },
   { tool: "search_policy", result: "Shipping, v1" },
 ];
 

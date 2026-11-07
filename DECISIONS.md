@@ -455,3 +455,14 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Exam link: Domain 2 (tools return only what's needed; that covers anything built from a tool result).
 - Built 2026-11-08 (D-49/D-50/D-51): lib/agent/steps.ts (+11 tests), loop/turn send a step per tool call (+3 tests), lib/agent/claude.ts (real client; model a setting, default claude-haiku-5-5, NOT yet verified against the live API), lib/server.ts (store, server-issued httpOnly visitor + conversation cookies so nobody can join a conversation someone else verified), app/api/chat (event stream), app/api/handoff (D-09 button, code only), app/page.tsx + Chat.tsx (Botanical look). Checked with a local fake Claude server through the real SDK: steps Verified / 2 orders / Shipping, v1, then the answer; browser check at 390 and 1280, 0 errors. Suite 73 passed, 1 skipped. Not deployed.
 - Open: hero says "GC-1043 shipped" but mei.lin has 2 orders, so the real label is "2 orders" (hero to match real data, or data to match hero). Handoff button has no server-side limit yet (one ticket per conversation proposed).
+
+## D-52 First deploy: B, password-protected for 2-3 days, then public — 2026-11-08
+- Choice: Niel, "b for now".
+- Rejected for now: A (public at once: unknown traffic, rough edges in public), C (unlisted link: leaks, so neither protected nor launched).
+- Why (Claude's suggestion): the fake server proved the plumbing, not how real Haiku behaves; the private days double as the Domain 4 prompt test.
+- Exam link: Domain 5 (prove reliability small before scaling).
+
+## D-53 Two defaults Claude proposed, Niel did not object — 2026-11-08
+- Hero animation matches the real data: list_orders step shows "2 orders" (Mei Lin has two orders), not "GC-1043 shipped".
+- "Talk to a person": at most one ticket per conversation (lib/rules/handoff.ts + test); repeat clicks get the same reply, no new ticket.
+- Known gap: clearing cookies starts a new conversation, so a determined script can still make tickets. Real fix = rate limit by IP at the edge; decide before going public (D-52).
