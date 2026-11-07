@@ -331,3 +331,10 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Exam link: TS 1.1 (stop_reason, tool results appended, anti-patterns)
 - Built 2026-11-07: lib/agent/loop.ts + loop.test.ts (7 tests, scripted Claude, $0). Proves: text+tool_use doesn't stop the loop; tool results return with matching tool_use_id; tool errors reach Claude as is_error; unknown tool -> error result; cap 8 -> honest fallback + log; max_tokens -> fallback + log. Suite 33 passed, 1 skipped (DB integration test).
 - D1 S2 exam Q (loop stops on 'any text'): answered B correctly. Niel's extra point on C: a fixed 3-round limit leaves no room for recovery steps such as retrying a temporarily unavailable API (D-30 'retry once' needs a round).
+
+## D-38 Handoff ticket: C (structured; code fills the facts, Claude adds only a one-line "what the customer wants") — 2026-11-07
+- Why (Niel): a transcript only (A) makes support read the whole chat to know what's happening; a Claude-written summary (B) can get a complaint detail wrong and cause real problems. C hard-codes what has actually been retrieved and done.
+- Fields (code): verified customer or "not verified"; orders and tool results touched; handoff reason (lock / reaction / button); priority (urgent for reactions); link to transcript. Claude: one line, only when the model was involved (not for the button, D-09).
+- Niel's addition: a short 60-day history of the customer's problems (e.g. repeated wrong-address deliveries, repeated refund requests), flags only, not a lot of information. How it is computed: D-38b.
+- Meeting line: "Support gets a ticket they can act on in seconds: facts from the system, one line of intent, urgency up front."
+- Exam link: TS 1.4 (structured handoff for humans without the transcript)
