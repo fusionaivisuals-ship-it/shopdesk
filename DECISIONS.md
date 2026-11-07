@@ -367,3 +367,10 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Meeting line: "The investigator spends effort where each failure needs it and keeps asking until the report has no gaps."
 - Exam link: TS 1.2
 - D1 S5 exam Q (investigator missed opened-product returns): answered C correctly. Reasoning: subagents did what they were assigned; synthesis can only combine what it receives; the coordinator's split was too narrow and it never checked for gaps.
+
+## D-41 Investigator findings format: B (structured: claim, evidence, source, certain) — 2026-11-07
+- Why (Niel): prose (A) depends on the right wording and won't give the best results; raw transcripts (C) fill the context window and the agent has to hope it pulls out the right information. B gives each agent precise information on what happened before and what needs to happen now.
+- Also (Claude): A loses sources when summaries are summarised again; B keeps every claim linked to the exact chat and keeps conflicting findings side by side.
+- Meeting line: "Agents pass each other findings with their sources attached, so every line of the final report can be traced back to a real conversation."
+- Exam link: TS 1.3 (explicit context, structured content vs metadata), 5.6 (provenance)
+- Built 2026-11-07: lib/investigate/findings.ts + test (3): subagentTask() writes goal, chats, constraints and prior findings (with sources) into the task; code rejects findings without a source; merging keeps conflicting findings side by side. Suite 44 passed, 1 skipped.
