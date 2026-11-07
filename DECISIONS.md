@@ -310,3 +310,7 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Rule behind it: put the database next to the code that queries it (several queries per chat turn); then put both near the users.
 - To verify at deploy time: whether the Vercel plan allows setting the function region to Singapore.
 - Meeting line: "Database and server sit together in Singapore, next to our users, so a chat turn's many database calls stay fast."
+- 2026-11-07: Neon project "shopdesk" (falling-bird-22823410, aws-ap-southeast-1 Singapore, created via Vercel Marketplace because the Neon org is Vercel-managed). Six D-34 tables + fictional data created.
+- Store made async (a real database answers asynchronously): tools, MCP server and tests updated; behaviour unchanged (26/26). Claude's earlier "only store.ts changes" was wrong.
+- Real-database check via the MCP server: verification persisted across server restarts. Found a bug the in-memory tests could not see: order dates shifted one day early (timezone conversion). Fixed (dates read as text); added lib/tools/store.neon.test.ts, which runs only when SHOPDESK_DATABASE_URL is set (skipped in normal runs/CI, $0). With the real database: 27/27.
+- Lesson (TS 5.5-ish): tests on a fake store prove the logic, not the real storage; keep at least one integration test against the real thing.

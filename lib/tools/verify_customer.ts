@@ -45,39 +45,39 @@ export type VerifyResult =
 
 const MIN = 60_000;
 
-export function verifyCustomer(
+export async function verifyCustomer(
   input: { email: string; order_number: string },
   ctx: Context,
   store: Store
-): VerifyResult {
-  if (store.getVerifiedCustomer(ctx.conversationId)) {
+): Promise<VerifyResult> {
+  if (await store.getVerifiedCustomer(ctx.conversationId)) {
     return { ok: true, next_step: "Already verified. Use list_orders." };
   }
 
   const orderNumber = input.order_number.trim().toUpperCase();
-  const order = store.findOrder(orderNumber);
+  const order = await store.findOrder(orderNumber);
   const orderKey = order ? `order:${order.number}` : null; // non-existent order: visitor only (Q5)
   const visitorKey = `visitor:${ctx.visitorId}`;
-  const orderCounter = orderKey ? store.getCounter(orderKey) : null;
-  const visitorCounter = store.getCounter(visitorKey);
+  const orderCounter = orderKey ? await store.getCounter(orderKey) : null;
+  const visitorCounter = await store.getCounter(visitorKey);
 
   // Either lock blocks (Q2). Details are not even checked while locked.
   const before = gate(orderCounter, visitorCounter, ctx.now);
   if (before.kind !== "open") return lockedResult(before, ctx.now);
 
-  const customer = order ? store.findCustomer(order.customerId) : null;
+  const customer = order ? await store.findCustomer(order.customerId) : null;
   const matches = !!customer && customer.email.toLowerCase() === input.email.trim().toLowerCase();
 
   if (matches && order && orderCounter) {
     const s = recordSuccess(orderCounter, visitorCounter, ctx.now);
-    store.setCounter(orderKey!, s.order);
-    store.setCounter(visitorKey, s.visitor);
-    store.setVerifiedCustomer(ctx.conversationId, order.customerId);
+    await store.setCounter(orderKey!, s.order);
+    await store.setCounter(visitorKey, s.visitor);
+    await store.setVerifiedCustomer(ctx.conversationId, order.customerId);
     return { ok: true, next_step: "Verified. Use list_orders to see this customer's orders." };
   }
 
   // Detailed reason goes to the staff log only, never to Claude (D-04).
-  store.log({
+  await store.log({
     event: "verify_failed",
     detail: !order ? "order_not_found" : "email_mismatch",
     orderNumber,
@@ -86,10 +86,10 @@ export function verifyCustomer(
   });
 
   const r = recordFailure(orderCounter, visitorCounter, ctx.now);
-  if (orderKey && r.order) store.setCounter(orderKey, r.order);
-  store.setCounter(visitorKey, r.visitor);
+  if (orderKey && r.order) await store.setCounter(orderKey, r.order);
+  await store.setCounter(visitorKey, r.visitor);
   if (r.events.includes("create_ticket")) {
-    store.createTicket({ kind: "verification_locked", orderNumber, conversationId: ctx.conversationId });
+    await store.createTicket({ kind: "verification_locked", orderNumber, conversationId: ctx.conversationId });
   }
 
   if (r.status.kind !== "open") return lockedResult(r.status, ctx.now);

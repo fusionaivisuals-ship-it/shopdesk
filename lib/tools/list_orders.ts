@@ -28,8 +28,8 @@ export type ToolError = {
   next_step: string;
 };
 
-export function listOrders(_input: Record<string, never>, ctx: Context, store: Store): { orders: OrderSummary[] } | ToolError {
-  const customerId = store.getVerifiedCustomer(ctx.conversationId);
+export async function listOrders(_input: Record<string, never>, ctx: Context, store: Store): Promise<{ orders: OrderSummary[] } | ToolError> {
+  const customerId = await store.getVerifiedCustomer(ctx.conversationId);
   if (!customerId) {
     return {
       isError: true,
@@ -39,10 +39,10 @@ export function listOrders(_input: Record<string, never>, ctx: Context, store: S
     };
   }
   try {
-    const orders = store.listOrdersFor(customerId);
+    const orders = await store.listOrdersFor(customerId);
     return { orders: orders.map((o) => ({ number: o.number, placed: o.placedAt, status: o.status })) };
   } catch (e) {
-    store.log({ event: "list_orders_failed", detail: String(e), conversationId: ctx.conversationId, at: ctx.now });
+    await store.log({ event: "list_orders_failed", detail: String(e), conversationId: ctx.conversationId, at: ctx.now });
     return {
       isError: true,
       category: "transient",
