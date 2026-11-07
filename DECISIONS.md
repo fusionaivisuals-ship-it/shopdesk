@@ -418,3 +418,8 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Choice: Niel, on Claude's recommendation. B (safety handoff) and C (break-it attempt) become "how it's built" cards, where they explain why rather than open the page (a skin reaction as the first image is a scary message for a skincare demo).
 - Meeting line: "The first thing you see is the agent doing real work: two questions, three tools, one answer with its source."
 - 2026-11-08: Hero built with the Stageshow skill (workflow followed: gold filmed, craft.md read, plan written, stills and gated films at 1280 and 390). Fixed during rehearsal: stray half-cropped earlier turn; orphaned last word; an UNSUPPORTED claim in the answer (tracking link in email: no tool returns that); phone layout squashed + empty band; invisible typing on phones; source chip landing hop. Phone gate passed; desktop gate fails only on the same two kit-level lines as the gold. Files: web/hero/ (ShopDeskHero.tsx, hero.css, REHEARSAL.md), web/stageshow/ (MIT kit, unmodified).
+
+## D-47 Look: Botanical (forest green + cream, serif wordmark) — 2026-11-08
+- Choice: Niel picked "the green one" over Blush after seeing both.
+- Applies to the whole page: hero, "how it's built" cards, live chat.
+- Redesign that came with it (Niel: the gray version was boring for a skincare chatbot): shop chat widget instead of a desktop window; brand-colored customer bubble; tool checks on a soft rule; real greeting; source as a brand pill. Both widths pass the Stageshow rehearsal gate (2026-11-08).
