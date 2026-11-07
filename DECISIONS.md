@@ -374,3 +374,4 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Meeting line: "Agents pass each other findings with their sources attached, so every line of the final report can be traced back to a real conversation."
 - Exam link: TS 1.3 (explicit context, structured content vs metadata), 5.6 (provenance)
 - Built 2026-11-07: lib/investigate/findings.ts + test (3): subagentTask() writes goal, chats, constraints and prior findings (with sources) into the task; code rejects findings without a source; merging keeps conflicting findings side by side. Suite 44 passed, 1 skipped.
+- D1 S6 exam Q (subagent ignored a constraint discussed with the coordinator): answered D correctly. Notes: B (fork) copies the whole discussion and its noise; forking is for exploring different approaches from one starting point, not for passing context. C's main flaw is 'if they need it': the subagent doesn't know the rule exists, so it won't go looking.
