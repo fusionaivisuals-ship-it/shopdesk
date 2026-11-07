@@ -438,3 +438,10 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Rejected for now: B (polish the page first, fake chat) and C (both, thin).
 - Meeting line (Claude's suggestion): "Build the risky part first. The live agent is where latency, cost and odd questions show up; the page can't tell me any of that."
 - Exam link: Domain 5 (test reliability of the risky part early).
+
+## D-50 Reply delivery: B, stream each tool step live, then the answer — 2026-11-08
+- Why (Niel): "it seems that something is happening at least, although it is more work."
+- Rejected: A (wait, then show all at once; simplest but ~5 s of silence), C (stream answer text only; hides the tool steps).
+- Consequence: the real chat now matches what the hero animation promises.
+- Open safety points (to decide next): what each step label may show (D-04/D-06 limits), and the D-08 fixed safety message must never be streamed over by Claude's own wording.
+- Exam link: Domain 1 (each tool_use round of the stop_reason loop is a natural event to send).
