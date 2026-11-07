@@ -345,3 +345,11 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Meeting line: "Support sees the customer's recent ticket counts, computed from records, not the model's opinion of them."
 - Built 2026-11-07: lib/agent/handoff.ts + test (4 tests). Ticket = code facts (customer verified/not, orders mentioned, actions taken paired from tool calls/results, reason, recommended action, priority, transcript link) + one Claude line (null for the button). 60-day counts by type for verified customers only. tickets table extended (customer_id, priority, details jsonb, index) on Neon; count query checked read-only on the real database. verify_customer's lock ticket now uses the same structure. Suite 37 passed, 1 skipped.
 - D1 S3 exam Q (gate checks 'called', not 'succeeded'): answered B correctly. Note on D: swapping get_order for list_orders doesn't help, because any tool behind the same broken gate leaks the same way; the gate's condition is the bug.
+
+## D-39 Hooks: B (a "before tool" hook only for rules that span several tools; single-tool rules stay inside their tools) — 2026-11-07
+- Why (Niel): no hooks (A) is foolish long term, especially with checks like email/order; repeating every check in a hook too (C) is overdoing it for now, though it may be needed later as the chatbot grows.
+- First cross-tool rule (D-08): after report_reaction, every other tool is blocked in that conversation; only the handoff remains. New tools are covered automatically.
+- Meeting line: "Rules that belong to one tool live in that tool; rules about the whole conversation live in one hook, so tools added later can't forget them."
+- Exam link: TS 1.5 (PreToolUse interception for guaranteed compliance)
+- Built 2026-11-07: lib/tools/report_reaction.ts (full description, urgent ticket via buildTicket), lib/agent/hooks.ts (beforeTool), loop wired: every tool call passes the hook; after a reaction, the turn's reply is the FIXED safety message even if the model wrote advice. Tests: hooks.test.ts (4). Suite 41 passed, 1 skipped.
+- KNOWN GAP (to decide): the hook blocks TOOLS after a reaction, not TEXT. In a later turn the model could still write product advice without calling a tool. Option to decide next: after a reaction, code answers every later message itself ("a person will contact you") without calling Claude.
