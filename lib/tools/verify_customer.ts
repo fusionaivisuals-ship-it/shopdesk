@@ -89,7 +89,15 @@ export async function verifyCustomer(
   if (orderKey && r.order) await store.setCounter(orderKey, r.order);
   await store.setCounter(visitorKey, r.visitor);
   if (r.events.includes("create_ticket")) {
-    await store.createTicket({ kind: "verification_locked", orderNumber, conversationId: ctx.conversationId });
+    // Verification failed, so the customer is unknown: no customerId, no history (D-38b).
+    await store.createTicket({
+      kind: "verification_locked",
+      priority: "normal",
+      conversationId: ctx.conversationId,
+      customerId: null,
+      createdAt: ctx.now,
+      details: { orderNumber, reason: "6 failed verification attempts on this order", recommended: "Confirm identity another way, then unlock the order from the tickets page." },
+    });
   }
 
   if (r.status.kind !== "open") return lockedResult(r.status, ctx.now);

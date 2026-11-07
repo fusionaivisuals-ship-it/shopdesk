@@ -338,3 +338,9 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Niel's addition: a short 60-day history of the customer's problems (e.g. repeated wrong-address deliveries, repeated refund requests), flags only, not a lot of information. How it is computed: D-38b.
 - Meeting line: "Support gets a ticket they can act on in seconds: facts from the system, one line of intent, urgency up front."
 - Exam link: TS 1.4 (structured handoff for humans without the transcript)
+
+## D-38b 60-day history flags: B (code counts the customer's past tickets by type) — 2026-11-07
+- Why (Niel): Claude reading past chats (A) can cause too many problems (a misread turns a normal customer into a "difficult" one); no history (C) costs support agents too much time.
+- Rules: verified customers only (D-02b; unverified -> no history, to avoid leaking someone else's history); neutral counts ("2 x delivery problem"), never labels. New ticket types (e.g. delivery problem) are counted once the tool that creates them exists.
+- Meeting line: "Support sees the customer's recent ticket counts, computed from records, not the model's opinion of them."
+- Built 2026-11-07: lib/agent/handoff.ts + test (4 tests). Ticket = code facts (customer verified/not, orders mentioned, actions taken paired from tool calls/results, reason, recommended action, priority, transcript link) + one Claude line (null for the button). 60-day counts by type for verified customers only. tickets table extended (customer_id, priority, details jsonb, index) on Neon; count query checked read-only on the real database. verify_customer's lock ticket now uses the same structure. Suite 37 passed, 1 skipped.
