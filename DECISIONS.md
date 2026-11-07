@@ -423,3 +423,6 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Choice: Niel picked "the green one" over Blush after seeing both.
 - Applies to the whole page: hero, "how it's built" cards, live chat.
 - Redesign that came with it (Niel: the gray version was boring for a skincare chatbot): shop chat widget instead of a desktop window; brand-colored customer bubble; tool checks on a soft rule; real greeting; source as a brand pill. Both widths pass the Stageshow rehearsal gate (2026-11-08).
+- v3 (Niel: "fix all"): an independent reviewer found 12 issues; 10 fixed, 2 kept with reasons (see web/hero/REHEARSAL.md). The widget now sits on the shop's own page. Gates pass at 1280 and 390; live check 0 dropped frames.
+- Meeting line: "A builder grading its own work misses things, so a separate reviewer that never saw my reasons judged the frames, and I fixed or answered every finding."
+- Exam link: Domain 1 (independent review by a subagent without the builder's context), Domain 5 (verification before claiming done).
