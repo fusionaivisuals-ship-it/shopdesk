@@ -413,3 +413,7 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Quality bar (Niel): it must look good; it may lead to real work.
 - Design source: Stageshow skill (github.com/benjitaylor/skills, MIT, read in full before use) for the illustrations; the chat itself is real, working code.
 - Meeting line: "One page answers what it does, why it's built that way, and lets you try it, in that order."
+
+## D-46 Hero animation: A (two-part question -> verify -> list orders -> policy search -> one combined answer with a policy link) — 2026-11-08
+- Choice: Niel, on Claude's recommendation. B (safety handoff) and C (break-it attempt) become "how it's built" cards, where they explain why rather than open the page (a skin reaction as the first image is a scary message for a skincare demo).
+- Meeting line: "The first thing you see is the agent doing real work: two questions, three tools, one answer with its source."
