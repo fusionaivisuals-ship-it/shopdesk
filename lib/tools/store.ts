@@ -4,6 +4,7 @@
 // Every method is async because a real database answers asynchronously.
 import { neon } from "@neondatabase/serverless";
 import { customers, orders, type Customer, type Order } from "../../data/shop";
+import { policies, type Policy } from "../../data/policies";
 import { emptyCounter, type Counter } from "../rules/lock";
 
 // A handoff ticket (D-38). Facts are filled by code; customerWants is the only model-written field.
@@ -27,6 +28,7 @@ export type Store = {
   createTicket(t: Ticket): Promise<void>;
   ticketCountsByKind(customerId: string, sinceMs: number): Promise<Record<string, number>>; // D-38b
   recentTicketsFor(customerId: string, sinceMs: number): Promise<Ticket[]>; // D-42
+  currentPolicies(): Promise<Policy[]>; // never superseded versions (D-10); throws when unavailable
   log(entry: Record<string, unknown>): Promise<void>; // staff only, never shown to Claude (D-04)
 };
 
@@ -49,6 +51,10 @@ export function memoryStore(opts: { down?: boolean } = {}): Store & { tickets: T
     getVerifiedCustomer: async (id) => verified.get(id) ?? null,
     setVerifiedCustomer: async (id, cus) => void verified.set(id, cus),
     createTicket: async (t) => void tickets.push(t),
+    currentPolicies: async () => {
+      if (opts.down) throw new Error("connection timeout"); // simulated outage (D-43)
+      return policies.filter((p) => p.supersededOn === null);
+    },
     recentTicketsFor: async (cus, since) => tickets.filter((t) => t.customerId === cus && t.createdAt >= since),
     ticketCountsByKind: async (cus, since) => {
       const counts: Record<string, number> = {};
@@ -107,6 +113,11 @@ export function neonStore(databaseUrl: string): Store {
       await sql`INSERT INTO tickets (kind, order_number, conversation_id, customer_id, priority, details, created_at)
                 VALUES (${t.kind}, ${(t.details.orderNumber as string) ?? null}, ${t.conversationId}, ${t.customerId},
                         ${t.priority}, ${JSON.stringify(t.details)}::jsonb, ${new Date(t.createdAt).toISOString()})`;
+    },
+    async currentPolicies() {
+      const rows = await sql`SELECT section, version, title, effective_from::text AS effective_from, body
+                             FROM policies WHERE superseded_on IS NULL ORDER BY section`;
+      return rows.map((r: any) => ({ section: r.section, version: r.version, title: r.title, effectiveFrom: r.effective_from, supersededOn: null, body: r.body }));
     },
     async recentTicketsFor(cus, since) {
       const rows = await sql`SELECT kind, priority, conversation_id, customer_id, details, status, created_at FROM tickets

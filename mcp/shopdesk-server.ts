@@ -7,6 +7,8 @@ import { z } from "zod";
 import { memoryStore, neonStore } from "../lib/tools/store";
 import { verifyCustomer, definition as verifyDef } from "../lib/tools/verify_customer";
 import { listOrders, definition as listDef } from "../lib/tools/list_orders";
+import { searchPolicy, definition as searchDef } from "../lib/tools/search_policy";
+import { readPolicy, definition as readDef } from "../lib/tools/read_policy";
 
 // Real database when SHOPDESK_DATABASE_URL is set (D-33), otherwise in-memory test data.
 const url = process.env.SHOPDESK_DATABASE_URL;
@@ -34,5 +36,15 @@ server.registerTool(
     return { ...asText(r), isError: "isError" in r }; // MCP-level error flag matches our contract (D-30)
   }
 );
+
+server.registerTool(searchDef.name, { description: searchDef.description, inputSchema: { query: z.string() } }, async (input) => {
+  const r: any = await searchPolicy(input, ctx(), store);
+  return { ...asText(r), isError: r?.isError === true };
+});
+
+server.registerTool(readDef.name, { description: readDef.description, inputSchema: { section: z.string() } }, async (input) => {
+  const r: any = await readPolicy(input, ctx(), store);
+  return { ...asText(r), isError: r?.isError === true };
+});
 
 await server.connect(new StdioServerTransport());

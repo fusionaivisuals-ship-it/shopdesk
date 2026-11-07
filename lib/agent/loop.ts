@@ -7,6 +7,8 @@ import { verifyCustomer, definition as verifyDef } from "../tools/verify_custome
 import { listOrders, definition as listDef } from "../tools/list_orders";
 import { reportReaction, definition as reactionDef, SAFETY_MESSAGE } from "../tools/report_reaction";
 import { beforeTool, reactionReported } from "./hooks";
+import { searchPolicy, definition as searchDef } from "../tools/search_policy";
+import { readPolicy, definition as readDef } from "../tools/read_policy";
 
 // The slice of the Anthropic Messages API the loop needs. Injected so tests can script it.
 export type Block =
@@ -24,6 +26,8 @@ const TOOLS: Record<string, { definition: unknown; run: Tool }> = {
   verify_customer: { definition: verifyDef, run: verifyCustomer },
   list_orders: { definition: listDef, run: listOrders },
   report_reaction: { definition: reactionDef, run: reportReaction },
+  search_policy: { definition: searchDef, run: searchPolicy },
+  read_policy: { definition: readDef, run: readPolicy },
 };
 
 export const MAX_ROUNDS = 8;
