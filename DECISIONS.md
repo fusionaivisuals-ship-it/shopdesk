@@ -385,3 +385,5 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Exam link: TS 1.7 (fresh start with structured summary vs resuming with stale tool results)
 - Built 2026-11-07: lib/agent/returning.ts + test (4); verify_customer adds recent_contact only on success. Store: recentTicketsFor (SQL checked read-only on Neon). Proves: last-48h contact included after verification; older not carried; nothing shown before verification; a new chat is never verified because an old one was. Suite 48 passed, 1 skipped.
 - Domain 1 build complete (TS 1.1-1.7).
+- D1 S7 exam Q (resumed session answers from stale reads): answered B correctly. Niel: D can be costly but may be needed if there are many changes. That is the exam's own rule: resume + name the changed files when most context is still valid; start fresh with a structured summary when much has changed.
+- DOMAIN 1 COMPLETE: 7/7 exam questions correct.
