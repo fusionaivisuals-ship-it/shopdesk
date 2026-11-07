@@ -432,3 +432,9 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Rejected: B (trimmed tool data) becomes one line on the A card instead of its own card; D (CI review bot) speaks to developers more than shop owners.
 - Meeting line (Claude's suggestion, Niel to confirm or reword): "A shows the core idea: Claude handles the language, code makes the decisions. C answers the first thing a business asks: what can this cost me?"
 - Exam link: Domain 1 (code-enforced gates over prompt instructions), Domain 5 (reliability and cost limits in production).
+
+## D-49 Build order: A, live chat first (Next.js + API route + Vercel), page polish after — 2026-11-08
+- Choice: Niel, "a for now".
+- Rejected for now: B (polish the page first, fake chat) and C (both, thin).
+- Meeting line (Claude's suggestion): "Build the risky part first. The live agent is where latency, cost and odd questions show up; the page can't tell me any of that."
+- Exam link: Domain 5 (test reliability of the risky part early).
