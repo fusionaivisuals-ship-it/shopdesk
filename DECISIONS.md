@@ -398,3 +398,11 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Bug found by the tests: substring matching let "have" match the skin-reactions text, so an uncovered question got an unrelated section. Fixed: whole-word matching + filler-word list.
 - PROCESS SLIP (Claude): while running /new-tool, files were written with Bash, which the skill's allowed-tools (D-19) excludes. Claude Code would have enforced it; here it was only Claude's discipline. Same lesson as D-02b: a rule that must hold needs enforcement, not intention.
 - Known limit: "send back" (a return) contains "send", which is in the shipping word group; watch for misranking in the Haiku trial.
+
+## D-44 Spend cap: D (daily total cap in code + per-visitor daily message limit; console monthly limit as backstop) — 2026-11-08
+- Why (Niel): a monthly limit alone (A) isn't good enough; there must be a daily limit. A daily cap alone (B) might cause other problems (one person can use up everyone's day); B and C together.
+- Settings: $1.00/day total (D-12), 20 messages per visitor per day (Claude's starting value, a setting). Day = Taipei calendar day.
+- How: every Claude reply reports tokens used -> code estimates cost with per-token prices kept as SETTINGS (not verified from here; check Anthropic's pricing page) -> spend_ledger. Checked BEFORE each turn; if over, Claude is not called and the visitor gets a fixed polite message.
+- Known limit: one turn can still run up to 8 rounds after passing the check, so a day can end slightly above $1; the round cap (D-37) bounds it.
+- Meeting line: "The demo can't cost more than about a dollar a day, and no single visitor can use up everyone else's share."
+- Built 2026-11-08: lib/rules/budget.ts (cap, per-visitor limit, cost from tokens, Taipei day), lib/agent/turn.ts = the D-36 fixed shell (budget check -> load -> loop -> save -> spend+log), loop now sums token usage. Neon: spend_ledger, visitor_usage, messages tables (empty, verified). Tests turn.test.ts (5): spend recorded from tokens; conversation saved and reloaded; over daily cap -> Claude not called, $0, polite message; one heavy visitor blocked while others are served; day resets at Taipei midnight. Suite 59 passed, 1 skipped. Prices in budget.ts are unverified settings.

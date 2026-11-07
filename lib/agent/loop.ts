@@ -16,7 +16,7 @@ export type Block =
   | { type: "tool_use"; id: string; name: string; input: any }
   | { type: "tool_result"; tool_use_id: string; content: string; is_error?: boolean };
 export type Message = { role: "user" | "assistant"; content: string | Block[] };
-export type ClaudeReply = { stop_reason: string; content: Block[] };
+export type ClaudeReply = { stop_reason: string; content: Block[]; usage?: { input_tokens: number; output_tokens: number } };
 export type Claude = {
   create(req: { system: string; tools: unknown[]; messages: Message[] }): Promise<ClaudeReply>;
 };
@@ -42,6 +42,7 @@ export type TurnResult = {
   messages: Message[]; // full history including tool calls and results
   rounds: number;
   endedBy: "end_turn" | "cap" | "other_stop_reason";
+  usage: { input_tokens: number; output_tokens: number }; // summed over every model call this turn (D-44)
 };
 
 export async function runTurn(args: {
@@ -52,29 +53,32 @@ export async function runTurn(args: {
   store: Store;
 }): Promise<TurnResult> {
   const messages = [...args.history];
+  const usage = { input_tokens: 0, output_tokens: 0 };
   // Fixed-shell rule (D-36, D-39b): once a reaction was reported earlier in this conversation,
   // no model call at all: no advice can be written, and the reply costs $0.
   if (reactionReported(args.history)) {
     messages.push({ role: "assistant", content: [{ type: "text", text: AFTER_REACTION_REPLY }] });
-    return { reply: AFTER_REACTION_REPLY, messages, rounds: 0, endedBy: "end_turn" };
+    return { reply: AFTER_REACTION_REPLY, messages, rounds: 0, endedBy: "end_turn", usage };
   }
   const tools = Object.values(TOOLS).map((t) => t.definition);
 
   for (let round = 1; round <= MAX_ROUNDS; round++) {
     const reply = await args.claude.create({ system: args.system, tools, messages });
+    usage.input_tokens += reply.usage?.input_tokens ?? 0;
+    usage.output_tokens += reply.usage?.output_tokens ?? 0;
     messages.push({ role: "assistant", content: reply.content });
 
     if (reply.stop_reason === "end_turn") {
       const text = reply.content.filter((b) => b.type === "text").map((b: any) => b.text).join("\n").trim();
       // D-08: once a reaction is reported this turn, the customer gets the FIXED safety message, not Claude's wording.
       const reported = reactionThisTurn(messages, args.history.length);
-      return { reply: reported ? SAFETY_MESSAGE : text, messages, rounds: round, endedBy: "end_turn" };
+      return { reply: reported ? SAFETY_MESSAGE : text, messages, rounds: round, endedBy: "end_turn", usage };
     }
 
     if (reply.stop_reason !== "tool_use") {
       // max_tokens, refusal, anything unexpected: never guess, fail honestly (D-37).
       await args.store.log({ event: "loop_unexpected_stop", stop_reason: reply.stop_reason, conversationId: args.ctx.conversationId });
-      return { reply: FALLBACK, messages, rounds: round, endedBy: "other_stop_reason" };
+      return { reply: FALLBACK, messages, rounds: round, endedBy: "other_stop_reason", usage };
     }
 
     // Run EVERY tool Claude asked for (there may be text in the same reply; that is not a stop signal).
@@ -105,7 +109,7 @@ export async function runTurn(args: {
   }
 
   await args.store.log({ event: "loop_cap_hit", rounds: MAX_ROUNDS, conversationId: args.ctx.conversationId });
-  return { reply: FALLBACK, messages, rounds: MAX_ROUNDS, endedBy: "cap" };
+  return { reply: FALLBACK, messages, rounds: MAX_ROUNDS, endedBy: "cap", usage };
 }
 
 function reactionThisTurn(messages: Message[], historyLength: number): boolean {
