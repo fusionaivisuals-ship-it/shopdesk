@@ -499,3 +499,15 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Exam link: Domain 4 (evaluation of prompts and outputs), Domain 5 (measure before changing the model).
 - Run 1 (2026-11-19, claude-haiku-5-5, US$0.328): 38/40. Both failures were grader bugs: X06/X09 counted a name/email the attacker had typed as a leak; no data was shown. Fixed to check only data the attacker didn't supply. Also confirms the model id works.
 - Run 2 (2026-11-19, GitHub run 44347462379, commit c258544, US$0.326): 40/40, median 1.7 s per message. Baseline for D-12: no measured reason to move off Haiku.
+
+## D-56 Agent and eval kept totally separate — 2026-11-19
+- Ask (Niel): "Keep the agent and the eval agent totally separate."
+- Problems found while separating them:
+  - The eval IMPORTED its expected answers (safety message) from the agent: a bad change to the message would have passed. Now the eval owns its copy.
+  - The eval used the agent's own cost function: the agent's accounting was grading itself. Now the eval meters raw usage with its own prices.
+  - Two cases (P11, S04) were near copies of examples in the agent's tool descriptions, so those passes only showed Haiku repeats its own examples. Rewritten; a test now blocks any 6-word overlap.
+- Enforced: tests/separation.test.ts (3 tests), one door (evals/target.ts), own key ANTHROPIC_EVAL_API_KEY (runner refuses to start next to the site's secrets), own workflow, path rule .claude/rules/evals.md, review criterion 5 in CLAUDE.md.
+- Needs Niel: create a second Anthropic key just for evals, with its own spend limit, and add it as the GitHub secret ANTHROPIC_EVAL_API_KEY. The eval won't run until then.
+- The 40/40 baseline (run 44347462379) is superseded: two cases changed. Rerun once the key is in.
+- Meeting line (Claude's suggestion): "The judge can't share code, keys or answers with the one it judges; a test fails the build if they touch."
+- Exam link: Domain 1 (independent reviewer without the builder's context), Domain 3 (path rules, CI), Domain 4 (eval design, avoiding overfitting).

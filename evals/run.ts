@@ -1,21 +1,24 @@
-// Runs the eval set against the REAL model (D-55). Code grades every case; nothing is judged by a model.
-// Usage (CI only, the key comes from GitHub secrets): npm run eval
-// Each case gets a fresh in-memory store with the fictional data, so cases can't affect each other.
+// Runs the eval set against the REAL model (D-55, D-56). Code grades every case; nothing is judged by a model.
+// Usage (CI only): npm run eval. Key: ANTHROPIC_EVAL_API_KEY, the eval's OWN key (never the site's).
+// The agent is reached only through ./target.ts. Each case gets a fresh agent with the fictional data.
 import { writeFileSync, mkdirSync } from "node:fs";
 import { CASES, type Case, type Check } from "./cases";
-import { handleMessage } from "../lib/agent/turn";
-import { memoryStore } from "../lib/tools/store";
-import { anthropicClaude, DEFAULT_MODEL } from "../lib/agent/claude";
-import { costCents } from "../lib/rules/budget";
+import { freshAgent, targetModel, type Usage } from "./target";
 
 const RUN_CAP_CENTS = 200; // hard stop for the whole run: US$2
 const CONCURRENCY = 3;
 const NOW = Date.UTC(2026, 10, 10, 2); // fixed clock: 10:00 Taipei, after returns v2 took effect
 
-const key = process.env.ANTHROPIC_API_KEY;
-if (!key) { console.error("ANTHROPIC_API_KEY not set (run this in CI)."); process.exit(1); }
-const model = process.env.SHOPDESK_MODEL || DEFAULT_MODEL;
-const claude = anthropicClaude(key, model);
+// D-56 separation: the eval has its own key and never runs next to the site's secrets or database.
+const key = process.env.ANTHROPIC_EVAL_API_KEY;
+if (!key) { console.error("ANTHROPIC_EVAL_API_KEY not set. The eval uses its own key, never the site's."); process.exit(1); }
+for (const forbidden of ["ANTHROPIC_API_KEY", "SHOPDESK_DATABASE_URL", "SHOPDESK_COOKIE_SECRET"]) {
+  if (process.env[forbidden]) { console.error(`${forbidden} is set. The eval must not run with the site's secrets.`); process.exit(1); }
+}
+const model = targetModel(process.env.EVAL_TARGET_MODEL);
+// The eval's own price table (US cents per million tokens), separate from the site's budget rules.
+const PRICE = { input: 100, output: 500 };
+const centsFor = (u: Usage) => (u.input_tokens * PRICE.input + u.output_tokens * PRICE.output) / 1_000_000;
 let spent = 0;
 
 type Call = { name: string; input: unknown };
@@ -47,20 +50,19 @@ function grade(c: Check, replies: string[], calls: Call[], tickets: any[]): stri
 
 async function runCase(c: Case): Promise<Outcome> {
   const t0 = Date.now();
-  const store = memoryStore();
+  let cents = 0;
+  const agent = freshAgent(key!, model, (u) => { const c2 = centsFor(u); cents += c2; spent += c2; });
+  const conv = `eval-${c.id}`;
   const replies: string[] = [];
   let error: string | undefined;
   try {
     for (const [i, text] of c.turns.entries()) {
       if (spent >= RUN_CAP_CENTS) throw new Error("run cap reached");
-      const r = await handleMessage({ claude, store, conversationId: `eval-${c.id}`, visitorId: `eval-${c.id}`, text, now: NOW + i * 60_000 });
-      replies.push(r.reply);
+      replies.push(await agent.send(conv, text, NOW + i * 60_000));
     }
   } catch (e) { error = String(e).slice(0, 200); }
-  const cents = (store.logs as any[]).filter((l) => l.event === "turn").reduce((s, l) => s + costCents(l.usage), 0);
-  spent += cents;
-  const calls = toolCalls(await store.loadMessages(`eval-${c.id}`));
-  const failures = error ? [`error: ${error}`] : c.checks.map((k) => grade(k, replies, calls, store.tickets)).filter((x): x is string => !!x);
+  const calls = toolCalls(await agent.transcript(conv));
+  const failures = error ? [`error: ${error}`] : c.checks.map((k) => grade(k, replies, calls, agent.tickets())).filter((x): x is string => !!x);
   return { id: c.id, category: c.category, why: c.why, pass: failures.length === 0, failures, replies, tools: calls.map((x) => x.name), cents, ms: Date.now() - t0, error };
 }
 

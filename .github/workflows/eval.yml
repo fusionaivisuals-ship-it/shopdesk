@@ -1,5 +1,6 @@
 # Real-model eval (D-55). Manual only: Actions -> eval -> Run workflow. Costs money (hard stop US$2 per run).
-# The API key comes from the repository secret; it never appears in the repo, the logs or chat.
+# D-56: the eval has its OWN key (secret ANTHROPIC_EVAL_API_KEY) with its own spend limit. The site's key,
+# database and cookie secret are never given to this job; the runner refuses to start if they are present.
 name: eval
 on:
   workflow_dispatch:
@@ -26,8 +27,8 @@ jobs:
       - run: npm ci
       - run: npm run eval
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          SHOPDESK_MODEL: ${{ inputs.model }}
+          ANTHROPIC_EVAL_API_KEY: ${{ secrets.ANTHROPIC_EVAL_API_KEY }}
+          EVAL_TARGET_MODEL: ${{ inputs.model }}
       - if: always()
         run: test -f evals/out/report.md && cat evals/out/report.md >> "$GITHUB_STEP_SUMMARY" || true
       - if: always()
