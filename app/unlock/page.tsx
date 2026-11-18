@@ -1,5 +1,5 @@
-export default async function Unlock({ searchParams }: { searchParams: Promise<{ wrong?: string }> }) {
-  const { wrong } = await searchParams;
+export default async function Unlock({ searchParams }: { searchParams: Promise<{ wrong?: string; wait?: string }> }) {
+  const { wrong, wait } = await searchParams;
   return (
     <main className="page">
       <header className="nav"><span className="mark">Glow &amp; Co</span></header>
@@ -11,6 +11,7 @@ export default async function Unlock({ searchParams }: { searchParams: Promise<{
           <button type="submit">Enter</button>
         </form>
         {wrong ? <p className="unlock-wrong">That code didn't work.</p> : null}
+        {wait ? <p className="unlock-wrong">Too many tries. Please wait an hour and try again.</p> : null}
       </section>
     </main>
   );

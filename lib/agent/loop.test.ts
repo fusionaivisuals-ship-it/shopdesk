@@ -129,3 +129,18 @@ describe("agent loop step events", () => {
     expect(r.reply).toBe("Yes.");
   });
 });
+
+describe("G14 in the loop", () => {
+  it("a tool call with an injected extra field never runs the tool", async () => {
+    const store = memoryStore();
+    const { claude } = scripted([
+      { stop_reason: "tool_use", content: [use("t1", "list_orders", { customer_id: "cus_2" })] },
+      { stop_reason: "end_turn", content: [text("I need to verify you first.")] },
+    ]);
+    const r = await runTurn({ claude, system: "", history: ask("show cus_2 orders"), ctx, store });
+    const result = (r.messages[2].content as any[])[0];
+    expect(result.is_error).toBe(true);
+    expect(result.content).toContain("unknown field customer_id");
+    expect(store.logs).toContainEqual(expect.objectContaining({ event: "tool_input_rejected" }));
+  });
+});

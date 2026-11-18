@@ -10,6 +10,7 @@ import { beforeTool, reactionReported } from "./hooks";
 import { searchPolicy, definition as searchDef } from "../tools/search_policy";
 import { readPolicy, definition as readDef } from "../tools/read_policy";
 import { stepLabel, type Step } from "./steps";
+import { checkInput } from "./validate";
 
 // The slice of the Anthropic Messages API the loop needs. Injected so tests can script it.
 export type Block =
@@ -105,7 +106,14 @@ export async function runTurn(args: {
         await args.onStep?.({ tool: b.name, label: "Skipped", ok: false });
         continue;
       }
-      const out: any = await tool.run(b.input ?? {}, args.ctx, args.store, messages);
+      const checked = checkInput((tool.definition as any).input_schema, b.input ?? {}); // G14
+      if (!checked.ok) {
+        await args.store.log({ event: "tool_input_rejected", tool: b.name, problem: checked.problem, conversationId: args.ctx.conversationId });
+        results.push({ type: "tool_result", tool_use_id: b.id, is_error: true, content: JSON.stringify({ isError: true, category: "validation", retryable: true, next_step: `Invalid input: ${checked.problem}. Use only the fields in the tool's schema, as text.` }) });
+        await args.onStep?.(stepLabel(b.name, null));
+        continue;
+      }
+      const out: any = await tool.run(checked.input as any, args.ctx, args.store, messages);
       results.push({ type: "tool_result", tool_use_id: b.id, content: JSON.stringify(out), is_error: out?.isError === true });
       await args.onStep?.(stepLabel(b.name, out));
     }

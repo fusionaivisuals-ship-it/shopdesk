@@ -1,10 +1,12 @@
-# Runs the unit tests on every pull request and every push to main (D-23).
-# No Claude API calls: costs $0.
+# Runs on every pull request and every push to main (D-23). No Claude API calls: costs $0.
+# Gates (SECURITY.md): unit tests, secret scan (G11), build, browser-bundle check (G12).
 name: tests
 on:
   pull_request:
   push:
     branches: [main]
+permissions:
+  contents: read
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -15,4 +17,8 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - run: npm run check:secrets
       - run: npm test
+      - run: npm run build
+      - run: npm run check:bundle
+      - run: npm audit --omit=dev --audit-level=high

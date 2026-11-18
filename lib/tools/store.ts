@@ -37,10 +37,13 @@ export type Store = {
   loadMessages(conversationId: string): Promise<{ role: "user" | "assistant"; content: unknown }[]>;
   appendMessages(conversationId: string, fromSeq: number, msgs: { role: "user" | "assistant"; content: unknown }[]): Promise<void>;
   log(entry: Record<string, unknown>): Promise<void>; // staff only, never shown to Claude (D-04)
+  // SECURITY.md G6: one atomic +1 per request; returns the new count for this key and window.
+  hit(key: string, windowStart: number): Promise<number>;
 };
 
 export function memoryStore(opts: { down?: boolean } = {}): Store & { tickets: Ticket[]; logs: unknown[] } {
   const counters = new Map<string, Counter>();
+  const hits = new Map<string, number>();
   const verified = new Map<string, string>();
   const tickets: Ticket[] = [];
   const spent = new Map<string, number>();
@@ -66,6 +69,11 @@ export function memoryStore(opts: { down?: boolean } = {}): Store & { tickets: T
     getVisitorMessages: async (v, d) => visitorMsgs.get(`${v}|${d}`) ?? 0,
     addVisitorMessage: async (v, d) => void visitorMsgs.set(`${v}|${d}`, (visitorMsgs.get(`${v}|${d}`) ?? 0) + 1),
     loadMessages: async (id) => [...(convMsgs.get(id) ?? [])],
+    hit: async (k, w) => {
+      const n = (hits.get(`${k}|${w}`) ?? 0) + 1;
+      hits.set(`${k}|${w}`, n);
+      return n;
+    },
     appendMessages: async (id, from, msgs) => {
       const list = convMsgs.get(id) ?? [];
       if (list.length !== from) throw new Error(`conversation ${id} changed concurrently`);
@@ -149,6 +157,12 @@ export function neonStore(databaseUrl: string): Store {
     async addVisitorMessage(v, d) {
       await sql`INSERT INTO visitor_usage (visitor_id, day, messages) VALUES (${v}, ${d}, 1)
                 ON CONFLICT (visitor_id, day) DO UPDATE SET messages = visitor_usage.messages + 1`;
+    },
+    async hit(k, w) {
+      const rows = await sql`INSERT INTO rate_hits (key, window_start, count) VALUES (${k}, ${new Date(w).toISOString()}, 1)
+                ON CONFLICT (key, window_start) DO UPDATE SET count = rate_hits.count + 1
+                RETURNING count`;
+      return Number(rows[0].count);
     },
     async loadMessages(id) {
       const rows = await sql`SELECT role, content FROM messages WHERE conversation_id = ${id} ORDER BY seq`;

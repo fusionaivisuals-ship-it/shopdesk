@@ -467,3 +467,26 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - "Talk to a person": at most one ticket per conversation (lib/rules/handoff.ts + test); repeat clicks get the same reply, no new ticket.
 - Known gap: clearing cookies starts a new conversation, so a determined script can still make tickets. Real fix = rate limit by IP at the edge; decide before going public (D-52).
 - How (Claude's call, 2026-11-08): Vercel's own Password Protection is a paid feature (exact plan/price not verified here), so the private days use an access code in code instead: middleware + /unlock page, code in the SHOPDESK_ACCESS_CODE env var (Vercel only, never in the repo), kept in an httpOnly cookie for 14 days. Delete the variable to go public, no code change. lib/access.ts + 5 tests. Region pinned to Singapore (vercel.json sin1) next to the Neon database (D-35).
+
+## D-54 Security review before deploy: gates in code, mapped in SECURITY.md — 2026-11-19
+- Ask (Niel): recheck everything for security before deploy; API key must not leak; put gates in place; the site should showcase security, not just a good chatbot.
+- Found and fixed (each with a test or a scripted attack):
+  - Cookie-based limits could be dodged by clearing cookies -> per-IP limits (G6), IP stored as keyed hash.
+  - Another website could make visitors' browsers send messages (CSRF; text/plain JSON was accepted) -> same-origin + JSON-only (G1, G2).
+  - Parallel requests could pass the budget check together and overshoot $1/day -> reserve 10c before Claude, settle after (G7).
+  - Conversation history (= input cost) could grow forever -> 15 customer messages per chat (G8).
+  - Cookies held plain ids and the plain access code -> HMAC-signed cookies + signed preview pass (G4).
+  - Preview code could be brute-forced -> 10 tries per IP per hour (G6).
+  - Missing database in production would silently fall back to memory, resetting every limit -> fail closed (G5).
+  - Claude's tool input reached the tools unchecked -> schema check before every tool (G14).
+  - No timeout on Claude calls (SDK default is minutes) -> 25 s, 1 retry, 600 output tokens (G9).
+  - No security headers -> CSP, no framing, nosniff, HSTS (G10).
+  - PostCSS advisories (build-time) -> patched 8.5.32; Next 15.5.29.
+  - CI: AI reviewer could run on a fork PR job; Claude Code unpinned -> same-repo PRs only, pinned 2.1.318 (G13).
+  - Added code gates for review criterion 4: secret scan (G11) and browser-bundle check (G12), both proven against a planted fake key.
+  - Database: least-privilege app user, no DELETE, read-only shop data (G15, needs Niel's console step).
+- Verified 2026-11-19: 112 unit tests; 15 scripted attacks on a local server all blocked; production without secrets returns 503; a Claude outage leaks nothing to the visitor.
+- New production settings: SHOPDESK_COOKIE_SECRET (required), SHOPDESK_ACCESS_CODE (preview), SHOPDESK_DATABASE_URL as the restricted user.
+- Not verifiable here: real Vercel IP headers (docs say x-forwarded-for is overwritten), real Haiku behaviour under injection (Domain 4).
+- Meeting line (Claude's suggestion): "The prompt asks, the code enforces. Every protection holds even if the model is tricked, and each one has a test."
+- Exam link: Domain 1 (code-enforced gates over prompt instructions), Domain 2 (tool input validation, least-privilege data access), Domain 3 (CI gates), Domain 5 (cost limits, fail-closed reliability).

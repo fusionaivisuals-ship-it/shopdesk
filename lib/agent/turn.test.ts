@@ -2,7 +2,7 @@
 import { describe, it, expect } from "vitest";
 import { handleMessage } from "./turn";
 import { memoryStore } from "../tools/store";
-import { BUDGET, OVER_DAILY, OVER_VISITOR, costCents, taipeiDay } from "../rules/budget";
+import { BUDGET, OVER_DAILY, OVER_VISITOR, CONVERSATION_FULL, costCents, taipeiDay } from "../rules/budget";
 import type { Claude, ClaudeReply } from "./loop";
 
 const NOW = Date.UTC(2026, 10, 8, 2); // 10:00 Taipei
@@ -54,5 +54,46 @@ describe("fixed shell around each message", () => {
   it("the budget day is the Taipei calendar day (resets at midnight Taipei, not UTC)", () => {
     expect(taipeiDay(Date.UTC(2026, 10, 8, 15, 59))).toBe("2026-11-08"); // 23:59 Taipei
     expect(taipeiDay(Date.UTC(2026, 10, 8, 16, 0))).toBe("2026-11-09");  // 00:00 Taipei
+  });
+});
+
+// SECURITY.md G7/G8 (2026-11-18)
+describe("cost gates in the shell", () => {
+  it("reserves before Claude runs, then settles to the real cost", async () => {
+    const store = memoryStore();
+    const day = taipeiDay(NOW);
+    let seenDuringCall = -1;
+    const claude: Claude = { async create() { seenDuringCall = await store.getSpent(day); return answer("Hi", 1000, 200); } };
+    await handleMessage({ claude, store, conversationId: "c1", visitorId: "v1", text: "hi", now: NOW });
+    expect(seenDuringCall).toBe(BUDGET.reserveCentsPerTurn);
+    expect(await store.getSpent(day)).toBeCloseTo(costCents({ input_tokens: 1000, output_tokens: 200 }));
+  });
+
+  it("a failed turn keeps the reservation charged (fails safe, never under-counts)", async () => {
+    const store = memoryStore();
+    const claude: Claude = { async create() { throw new Error("network"); } };
+    await expect(handleMessage({ claude, store, conversationId: "c1", visitorId: "v1", text: "hi", now: NOW })).rejects.toThrow();
+    expect(await store.getSpent(taipeiDay(NOW))).toBe(BUDGET.reserveCentsPerTurn);
+  });
+
+  it("refuses when the reservation would cross the daily cap", async () => {
+    const store = memoryStore();
+    await store.addSpent(taipeiDay(NOW), BUDGET.dailyCents - BUDGET.reserveCentsPerTurn + 1);
+    const s = scripted([]);
+    const r = await handleMessage({ claude: s.claude, store, conversationId: "c1", visitorId: "v1", text: "hi", now: NOW });
+    expect(r.status).toBe("over_daily_cap");
+    expect(s.calls()).toBe(0);
+  });
+
+  it("a long conversation stops at the limit without calling Claude or counting a message", async () => {
+    const store = memoryStore();
+    const msgs = [];
+    for (let i = 0; i < BUDGET.customerMessagesPerConversation; i++) msgs.push({ role: "user" as const, content: `q${i}` }, { role: "assistant" as const, content: [{ type: "text", text: "a" }] });
+    await store.appendMessages("long", 0, msgs);
+    const s = scripted([]);
+    const r = await handleMessage({ claude: s.claude, store, conversationId: "long", visitorId: "v1", text: "one more", now: NOW });
+    expect(r).toEqual({ reply: CONVERSATION_FULL, status: "conversation_full" });
+    expect(s.calls()).toBe(0);
+    expect(await store.getVisitorMessages("v1", taipeiDay(NOW))).toBe(0);
   });
 });

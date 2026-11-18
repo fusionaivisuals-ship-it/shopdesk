@@ -9,6 +9,8 @@ permissions:
   issues: write
 jobs:
   review:
+    # G13: only PRs from branches of THIS repo get the API key. A stranger's fork PR never runs with it.
+    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,7 +19,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install -g @anthropic-ai/claude-code
+      - run: npm install -g @anthropic-ai/claude-code@2.1.318 # pinned: a new release can't run with the key unreviewed
       - run: node .github/scripts/review.mjs
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
