@@ -490,3 +490,10 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Not verifiable here: real Vercel IP headers (docs say x-forwarded-for is overwritten), real Haiku behaviour under injection (Domain 4).
 - Meeting line (Claude's suggestion): "The prompt asks, the code enforces. Every protection holds even if the model is tricked, and each one has a test."
 - Exam link: Domain 1 (code-enforced gates over prompt instructions), Domain 2 (tool input validation, least-privilege data access), Domain 3 (CI gates), Domain 5 (cost limits, fail-closed reliability).
+
+## D-55 Eval: C in two steps; step 1 = code-graded real-model eval — 2026-11-19
+- Choice: Niel, "run it" (took the recommendation: code grading now, a Claude grader later for what code can't judge).
+- Built: evals/cases.ts (40 cases: policy 11, order 9, safety 7, security 9, scope 4), evals/run.ts (fresh fictional store per case, real model, code-only grading, US$2 hard stop), .github/workflows/eval.yml (manual run, key from the repo secret, report in the job summary + artifact).
+- Correction (Claude): first cost estimate (~NT$5/run) was too low; each round resends the tool descriptions. Expect ~US$0.50-1 (NT$16-32) per run.
+- Fulfils: D-12 "test run" + upgrade trigger, D-11 policy-gap count, the reaction test, and the real-model injection check SECURITY.md said was untested.
+- Exam link: Domain 4 (evaluation of prompts and outputs), Domain 5 (measure before changing the model).

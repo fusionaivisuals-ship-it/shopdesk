@@ -1,0 +1,37 @@
+# Real-model eval (D-55). Manual only: Actions -> eval -> Run workflow. Costs money (hard stop US$2 per run).
+# The API key comes from the repository secret; it never appears in the repo, the logs or chat.
+name: eval
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "Model id (blank = the site's default)"
+        required: false
+        default: ""
+permissions:
+  contents: read
+concurrency:
+  group: eval
+  cancel-in-progress: false
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run eval
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SHOPDESK_MODEL: ${{ inputs.model }}
+      - if: always()
+        run: test -f evals/out/report.md && cat evals/out/report.md >> "$GITHUB_STEP_SUMMARY" || true
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: evals/out/
