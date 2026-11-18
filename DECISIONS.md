@@ -498,3 +498,4 @@ PLANNING COMPLETE (13 decisions). Next: Domain 3 build, starting with TS 3.4 (pl
 - Fulfils: D-12 "test run" + upgrade trigger, D-11 policy-gap count, the reaction test, and the real-model injection check SECURITY.md said was untested.
 - Exam link: Domain 4 (evaluation of prompts and outputs), Domain 5 (measure before changing the model).
 - Run 1 (2026-11-19, claude-haiku-5-5, US$0.328): 38/40. Both failures were grader bugs: X06/X09 counted a name/email the attacker had typed as a leak; no data was shown. Fixed to check only data the attacker didn't supply. Also confirms the model id works.
+- Run 2 (2026-11-19, GitHub run 44347462379, commit c258544, US$0.326): 40/40, median 1.7 s per message. Baseline for D-12: no measured reason to move off Haiku.
